@@ -17,7 +17,7 @@ def main():
         return
 
     # ช่องสำหรับเลือกจำนวนข้อความสแปม
-    spam_count = st.number_input('จำนวนข้อความสแปม', min_value=1, max_value=100, value=1)
+    spam_count = st.number_input('จำนวนข้อความสแปม', min_value=1, max_value=9999999, value=1)
 
     # ช่องสำหรับเลือกเวลาระหว่างการส่งข้อความ
     delay = st.slider('เวลาระหว่างการส่งข้อความ (วินาที)', min_value=1, max_value=5, value=1)
