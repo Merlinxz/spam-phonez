@@ -120,7 +120,6 @@ def main():
     
     # Action buttons
     col1, col2, col3 = st.columns(3)
-    
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
             if not target_numbers:
@@ -143,12 +142,13 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    messages = generate_spam_messages(num_messages, message_type)
-                    progress_bar = st.progress(0)
-                    for i, message in enumerate(messages):
-                        time.sleep(delay_between_messages)
-                        progress_bar.progress(int(((i + 1) / num_messages) * 100))
-                        st.write(f"📩 Sent to {random.choice(target_numbers)}: {message}")
+                    message_box = st.empty()
+                    for i in range(num_messages):
+                        for number in target_numbers:
+                            message = generate_spam_messages(1, message_type)[0]
+                            display_message = f"📩 Sent to {number}: {message}"
+                            message_box.markdown(f"<div style='background-color: #F0F0F0; padding: 10px; border-radius: 5px;'>{display_message}</div>", unsafe_allow_html=True)
+                            time.sleep(delay_between_messages)
                     st.success("✅ Messages sent successfully!")
     
     with col3:
