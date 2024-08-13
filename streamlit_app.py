@@ -38,19 +38,6 @@ def plot_response_rates(df):
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
-    # Sidebar for configuration
-    st.sidebar.title("⚙️ Configuration")
-    theme = st.sidebar.selectbox("🎨 Theme", ["Light", "Dark"])
-    if theme == "Dark":
-        st.markdown("""
-        <style>
-        .stApp {
-            background-color: #1E1E1E;
-            color: #FFFFFF;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    
     # Animated title
     animated_text("🚀 Spam Attacker Pro 3.0")
     
