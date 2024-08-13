@@ -11,11 +11,38 @@ def format_phone_number(phone_number):
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
     for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center;'>{text[:i]}</h1>", unsafe_allow_html=True)
+        placeholder.markdown(f"<h1 style='text-align: center; color: #1E90FF;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro", layout="wide")
+    
+    # Custom CSS for better UI
+    st.markdown("""
+    <style>
+    .stButton>button {
+        background-color: #4CAF50;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        border: none;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        transition-duration: 0.4s;
+    }
+    .stButton>button:hover {
+        background-color: #45a049;
+    }
+    .stProgress > div > div > div {
+        background-color: #1E90FF;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     # Animated title
     animated_text("🚀 Spam Attacker Pro")
@@ -24,20 +51,22 @@ def main():
     col1, col2 = st.columns([1, 2])
     
     with col1:
-        st.subheader("Configuration")
+        st.markdown("<h2 style='text-align: center; color: #1E90FF;'>Configuration</h2>", unsafe_allow_html=True)
         raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
         phone_number = format_phone_number(raw_phone_number)
         num_messages = st.number_input("📊 Number of Messages", min_value=1, max_value=99999, value=10)
         delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
         
         # Create two columns for buttons
-        button_col1, button_col2 = st.columns([1, 1])
+        button_col1, button_col2 = st.columns(2)
         with button_col1:
             generate_button = st.button("🎲 Generate", use_container_width=True)
         with button_col2:
-            send_button = st.button("📤 Send", use_container_width=True)
+            send_button = st.button('📤 Send', use_container_width=True)
     
     with col2:
+        st.markdown("<h2 style='text-align: center; color: #1E90FF;'>Messages</h2>", unsafe_allow_html=True)
+        # Generate spam messages
         if generate_button:
             if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
                 st.error("❌ Please enter a valid 10-digit phone number.")
@@ -51,30 +80,31 @@ def main():
                         success_placeholder.success(f"{'🎉 ' * i}Spam messages generated successfully!{'🎉 ' * i}")
                         time.sleep(0.3)
                     
-                    # Display generated messages with animation
+                    # Displaying generated messages with animation
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
-                            st.write(message)
+                            st.markdown(f"<div style='background-color: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px;'>{message}</div>", unsafe_allow_html=True)
                             time.sleep(0.1)
                     
                     st.text_area("📜 Message Preview", value="\n".join(generated_messages), height=300)
         
+        # Send spam messages
         if send_button:
             if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
-                st.error("❌ Please enter a valid phone number.")
+                st.error('❌ Please enter a valid phone number.')
             else:
                 message_placeholder = st.empty()
                 progress_placeholder = st.progress(0)
                 sending_placeholder = st.empty()
                 
-                with st.spinner("📡 Sending spam messages..."):
+                with st.spinner('📡 Sending spam messages...'):
                     for i in range(int(num_messages)):
                         message = generate_spam_messages(1)[0]  # Generate a single message
-                        message_placeholder.markdown(f"**Spam message {i+1}/{num_messages} to Number {phone_number}:**\n\n{message}")
+                        message_placeholder.markdown(f"<div style='background-color: #e6f3ff; padding: 15px; border-radius: 10px; margin-bottom: 15px;'><strong>Spam message {i+1}/{num_messages} to Number {phone_number}:</strong><br><br>{message}</div>", unsafe_allow_html=True)
                         
                         # Animated sending indicator
                         for j in range(3):
-                            sending_placeholder.markdown(f"Sending{'.' * (j + 1)}")
+                            sending_placeholder.markdown(f"<h3 style='text-align: center; color: #1E90FF;'>Sending{'.' * (j + 1)}</h3>", unsafe_allow_html=True)
                             time.sleep(delay_between_messages / 3)
                         
                         if i < num_messages - 1:
