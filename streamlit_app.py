@@ -158,8 +158,8 @@ def main():
                             time.sleep(delay_between_messages)
                             # Simulate sending message
                             sent_messages.append(f"📩 Sent to {random.choice(target_numbers)}: {message}")
-                            # Calculate progress
-                            progress = (i + 1) / total_messages * 100 if total_messages > 0 else 100
+                            # Calculate progress (as a fraction between 0 and 1)
+                            progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                         
                         st.success("✅ Messages sent successfully!")
