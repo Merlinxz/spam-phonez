@@ -176,7 +176,7 @@ def generate_spam_messages(num_messages: int, message_type: str):
 
     # Generate the list of spam messages
     spam_messages = []
-    for _ in range(num_messages, message_type):
+    for _ in range(num_messages,):
         template = random.choice(templates)
         otp = str(random.randint(100000, 999999))
         link = random.choice(suspicious_links)
