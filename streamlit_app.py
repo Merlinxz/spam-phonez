@@ -62,32 +62,24 @@ def main():
 
                 st.success('Spam messages sent successfully!')
 
-    st.markdown("""
+    # Add watermark
+    st.markdown(
+        """
         <style>
-        .footer {
+        .watermark {
             position: fixed;
-            bottom: 0;
-            right: 0;
-            padding: 10px;
-            z-index: 9999;
-            opacity: 0.5;
-        }
-        .footer a {
-            color: inherit;
-            text-decoration: none;
-        }
-        .footer img {
-            width: 40px;
-            height: auto;
-            vertical-align: middle;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.3;
+            z-index: 1000;
         }
         </style>
-        <div class="footer">
-            <a href="https://github.com/Merlinxz" target="_blank">
-                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo">
-            </a>
+        <div class="watermark">
+            <img src="https://path-to-your-watermark-image/watermark.png" width="150" />
         </div>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
 
 if __name__ == "__main__":
     main()
