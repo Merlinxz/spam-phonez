@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 from spam_generator import generate_spam_messages
+from streamlit_extras import st_animated_header  # Ensure you have this package installed
 
 def format_phone_number(phone_number):
     # Remove any non-digit characters
@@ -13,9 +14,8 @@ def format_phone_number(phone_number):
 def main():
     st.set_page_config(page_title="Spam Attacker", layout="wide")
 
-    # Application Header
-    st.title("Spam Attacker")
-    st.subheader("Generate and Send Spam Messages")
+    # Application Header with animation
+    st_animated_header("Spam Attacker", subheader="Generate and Send Spam Messages")
 
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
