@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import random
 import pandas as pd
-import plotly.express as px
 from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
@@ -27,16 +26,8 @@ def generate_report(target_numbers, num_messages, message_type):
     df = pd.DataFrame(data)
     return df
 
-def plot_delivery_rates(df):
-    fig = px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
-    return fig
-
-def plot_response_rates(df):
-    fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
-    return fig
-
 def main():
-    st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
+    st.set_page_config(page_title="Spam Attacker Pro 3.1", layout="wide")
     
     # Sidebar for configuration
     st.sidebar.title("⚙️ Configuration")
@@ -52,7 +43,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Animated title
-    animated_text("🚀 Spam Attacker Pro 3.0")
+    animated_text("🚀 Spam Attacker Pro 3.1")
     
     # Main content area
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
@@ -105,9 +96,11 @@ def main():
             st.subheader("📊 Campaign Analytics")
             col1, col2 = st.columns(2)
             with col1:
-                st.plotly_chart(plot_delivery_rates(st.session_state.report_data))
+                st.bar_chart(st.session_state.report_data.set_index('Phone Number')['Delivery Rate'])
+                st.write("Message Delivery Rates")
             with col2:
-                st.plotly_chart(plot_response_rates(st.session_state.report_data))
+                st.scatter_chart(st.session_state.report_data, x='Messages Sent', y='Response Rate')
+                st.write("Response Rates vs Messages Sent")
             
             st.subheader("📑 Detailed Report")
             st.dataframe(st.session_state.report_data)
@@ -167,7 +160,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("📊 Spam Attacker Pro 3.0 - For educational purposes only")
+    st.markdown("📊 Spam Attacker Pro 3.1 - For educational purposes only")
 
 if __name__ == "__main__":
     main()
