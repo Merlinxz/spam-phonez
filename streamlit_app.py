@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import random
 import pandas as pd
-import plotly.express as px
 from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
