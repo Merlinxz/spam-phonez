@@ -25,7 +25,7 @@ def main():
     raw_phone_number = st.sidebar.text_input("Phone Number (10 digits)", "")
     phone_number = format_phone_number(raw_phone_number)
     num_messages = st.sidebar.number_input("Number of Messages", min_value=1, max_value=100, value=1)
-    delay_between_messages = st.sidebar.slider("Delay Between Messages (seconds)", min_value=1, max_value=5, value=1)
+    delay_between_messages = st.sidebar.input("Delay Between Messages (seconds)", min_value=1, max_value=5, value=1)
 
     # Session state to persist messages
     if 'spam_messages' not in st.session_state:
