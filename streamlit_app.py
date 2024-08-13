@@ -19,7 +19,7 @@ def main():
     st.set_page_config(page_title="Spam Attacker Pro", layout="wide")
     
     # Animated title
-    animated_text("🚀 Spam Attacker Pro")
+    st.title.animated_text("🚀 Spam Attacker Pro")
     
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
@@ -29,7 +29,7 @@ def main():
     raw_phone_number = st.sidebar.text_input("📱 Phone Number (10 digits)", "")
     phone_number = format_phone_number(raw_phone_number)
     num_messages = st.sidebar.slider("📊 Number of Messages", min_value=1, max_value=999999, value=10)
-    delay_between_messages = st.sidebar.slider("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=10, value=2)
+    delay_between_messages = st.sidebar.slider("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
     
     # Session state to persist messages
     if 'spam_messages' not in st.session_state:
