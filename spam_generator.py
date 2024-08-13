@@ -3,7 +3,7 @@ from faker import Faker
 
 fake = Faker()
 
-def generate_spam_messages(count):
+def generate_spam_messages(num_messages: int, message_type: str):
     # Updated list of possible message templates in Thai, including more diverse applications and usage contexts
     templates = [
         "สวัสดี รหัส OTP ของคุณสำหรับการตรวจสอบบัญชีคือ {otp}. กรุณาใส่รหัสเพื่อดำเนินการต่อ. ลิงก์: {link}",
@@ -176,7 +176,7 @@ def generate_spam_messages(count):
 
     # Generate the list of spam messages
     spam_messages = []
-    for _ in range(count):
+    for _ in range(num_messages, message_type):
         template = random.choice(templates)
         otp = str(random.randint(100000, 999999))
         link = random.choice(suspicious_links)
