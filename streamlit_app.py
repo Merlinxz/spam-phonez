@@ -4,14 +4,12 @@ from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    if len(cleaned_number) == 10:
-        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
-    return phone_number
+    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
 
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
     for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center;'>{text[:i]}</h1>", unsafe_allow_html=True)
+        placeholder.markdown(f"<h1 style='text-align: center; color: #00bfae;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
 def main():
@@ -38,7 +36,6 @@ def main():
             send_button = st.button('📤 Send', use_container_width=True)
     
     with col2:
-        # Generate spam messages
         if generate_button:
             if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
                 st.error("❌ Please enter a valid 10-digit phone number.")
@@ -49,18 +46,17 @@ def main():
                     # Animated success message
                     success_placeholder = st.empty()
                     for i in range(5):
-                        success_placeholder.success(f"{'🎉 ' * i}Spam messages generated successfully!{'🎉 ' * i}")
+                        success_placeholder.success(f"<span style='color: #4CAF50;'>🎉{'🎉 ' * i} Spam messages generated successfully!{' 🎉' * i}</span>", unsafe_allow_html=True)
                         time.sleep(0.3)
                     
                     # Displaying generated messages with animation
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
-                            st.write(message)
+                            st.write(f"<div style='border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin: 5px 0;'>{message}</div>", unsafe_allow_html=True)
                             time.sleep(0.1)
                     
                     st.text_area("📜 Message Preview", value="\n".join(generated_messages), height=300)
         
-        # Send spam messages
         if send_button:
             if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
                 st.error('❌ Please enter a valid phone number.')
@@ -70,13 +66,13 @@ def main():
                 sending_placeholder = st.empty()
                 
                 with st.spinner('📡 Sending spam messages...'):
-                    for i in range(int(num_messages)):
+                    for i in range(num_messages):
                         message = generate_spam_messages(1)[0]  # Generate a single message
-                        message_placeholder.markdown(f"**Spam message {i+1}/{num_messages} to Number {phone_number}:**\n\n{message}")
+                        message_placeholder.markdown(f"<div style='background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 5px; padding: 10px;'><strong>Spam message {i+1}/{num_messages} to Number {phone_number}:</strong><br>{message}</div>", unsafe_allow_html=True)
                         
                         # Animated sending indicator
                         for j in range(3):
-                            sending_placeholder.markdown(f"Sending{'.' * (j + 1)}")
+                            sending_placeholder.markdown(f"<span style='color: #2196F3;'>Sending{'.' * (j + 1)}</span>", unsafe_allow_html=True)
                             time.sleep(delay_between_messages / 3)
                         
                         if i < num_messages - 1:
@@ -88,7 +84,7 @@ def main():
                     # Animated success message
                     success_placeholder = st.empty()
                     for i in range(5):
-                        success_placeholder.success(f"{'🚀 ' * i}Spam messages sent successfully!{'🚀 ' * i}")
+                        success_placeholder.success(f"<span style='color: #4CAF50;'>🚀{'🚀 ' * i} Spam messages sent successfully!{' 🚀' * i}</span>", unsafe_allow_html=True)
                         time.sleep(0.3)
 
 if __name__ == "__main__":
