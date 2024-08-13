@@ -1,6 +1,12 @@
 import streamlit as st
 import time
+import re
 from spam_generator import generate_spam_messages
+
+def validate_phone_number(phone_number):
+    """ Validate phone number format xxx-xxx-xxxx """
+    pattern = r"^\d{3}-\d{3}-\d{4}$"
+    return re.match(pattern, phone_number) is not None
 
 def main():
     st.set_page_config(page_title="Spam Attacker", layout="wide")
@@ -14,9 +20,9 @@ def main():
     st.sidebar.subheader("Configuration")
 
     # Input fields
-    phone_number = st.sidebar.text_input("Phone Number (10 digits)", "")
+    phone_number = st.sidebar.text_input("Phone Number (xxx-xxx-xxxx)", "")
     num_messages = st.sidebar.number_input("Number of Messages", min_value=1, max_value=99999, value=1)
-    delay_between_messages = st.sidebar.slider("Delay Between Messages (seconds)", min_value=1, max_value=10, value=1)
+    delay_between_messages = st.sidebar.slider("Delay Between Messages (seconds)", min_value=1, max_value=15, value=1)
 
     # Session state to persist messages
     if 'spam_messages' not in st.session_state:
@@ -24,8 +30,8 @@ def main():
 
     # Button to generate spam messages
     if st.sidebar.button("Generate Spam Messages"):
-        if len(phone_number) != 10 or not phone_number.isdigit():
-            st.error("Please enter a valid 10-digit phone number.")
+        if not validate_phone_number(phone_number):
+            st.error("Please enter a valid phone number in the format xxx-xxx-xxxx.")
         else:
             with st.spinner("Generating spam messages..."):
                 st.session_state.spam_messages = generate_spam_messages(num_messages)
@@ -42,8 +48,8 @@ def main():
     if st.sidebar.button('Send Spam Messages'):
         if not st.session_state.spam_messages:
             st.error('No spam messages generated. Please generate messages first.')
-        elif len(phone_number) != 10 or not phone_number.isdigit():
-            st.error('Please enter a valid phone number.')
+        elif not validate_phone_number(phone_number):
+            st.error('Please enter a valid phone number in the format xxx-xxx-xxxx.')
         else:
             # Placeholder for spam messages
             message_placeholder = st.empty()
