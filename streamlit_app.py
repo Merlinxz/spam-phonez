@@ -2,20 +2,12 @@ import streamlit as st
 import time
 from spam_generator import generate_spam_messages
 
-def streamlit():
-    st.markdown(
-        "![Streamlit App](https://img.shields.io/badge/Streamlit-Example-green)"
-    )
-
 def main():
     st.set_page_config(page_title="Spam Attacker", layout="wide")
 
     # Application Header
     st.title("Spam Attacker")
     st.subheader("Generate and Send Spam Messages")
-
-    # Add Streamlit Badge
-    streamlit()
 
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
