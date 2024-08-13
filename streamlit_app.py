@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 from spam_generator import generate_spam_messages
+from streamlit_extras.badges import badge
 
 def main():
     st.set_page_config(page_title="Spam Attacker", layout="wide")
@@ -37,6 +38,9 @@ def main():
                         st.write(message)
                 
                 st.text_area("Message Preview", value="\n".join(st.session_state.spam_messages), height=300)
+
+
+    badge(type="github", name="streamlit/streamlit")
 
     # Button to send spam messages
     if st.sidebar.button('Send Spam Messages'):
