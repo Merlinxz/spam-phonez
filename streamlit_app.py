@@ -19,7 +19,7 @@ def main():
     st.set_page_config(page_title="Spam Attacker Pro", layout="wide")
     
     # Animated title
-    st.title.animated_text("🚀 Spam Attacker Pro")
+    animated_text("🚀 Spam Attacker Pro")
     
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
@@ -72,7 +72,7 @@ def main():
                 for i, message in enumerate(st.session_state.spam_messages, start=1):
                     message_placeholder.markdown(f"**Spam message {i}/{num_messages} to Number {phone_number}:**\n\n{message}")
                     
-                    # Animated sending indicator (moved from sidebar to main content)
+                    # Animated sending indicator
                     for j in range(3):
                         sending_placeholder.markdown(f"Sending{'.' * (j + 1)}")
                         time.sleep(delay_between_messages / 3)
