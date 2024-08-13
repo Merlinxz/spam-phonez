@@ -14,7 +14,7 @@ def main():
         return
 
     # Input field for spam count
-    spam_count = st.number_input('Number of spam messages', min_value=1, max_value=999, value=1)
+    spam_count = st.number_input('Number of spam messages', min_value=1, max_value=5000, value=1)
 
     # Input field for delay between messages
     delay = st.slider('Delay between messages (seconds)', min_value=1, max_value=50, value=1)
