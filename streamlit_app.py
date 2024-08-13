@@ -160,7 +160,6 @@ def main():
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
-
     
     with col3:
         if st.button("💾 Save Campaign", use_container_width=True):
