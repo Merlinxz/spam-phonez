@@ -30,9 +30,12 @@ def main():
         num_messages = st.slider("📊 Number of Messages", min_value=1, max_value=999999, value=10)
         delay_between_messages = st.slider("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
         
-        # Buttons
-        generate_button = st.button("🎲 Generate Spam Messages")
-        send_button = st.button('📤 Send Spam Messages')
+        # Create two columns for buttons
+        button_col1, button_col2 = st.columns(2)
+        with button_col1:
+            generate_button = st.button("🎲 Generate", use_container_width=True)
+        with button_col2:
+            send_button = st.button('📤 Send', use_container_width=True)
     
     with col2:
         # Session state to persist messages
