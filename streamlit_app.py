@@ -46,13 +46,13 @@ def main():
                     # Animated success message
                     success_placeholder = st.empty()
                     for i in range(5):
-                        success_placeholder.success(f"<span style='color: #4CAF50;'>🎉{'🎉 ' * i} Spam messages generated successfully!{' 🎉' * i}</span>", unsafe_allow_html=True)
+                        success_placeholder.markdown(f"<span style='color: #4CAF50;'>🎉{'🎉 ' * i} Spam messages generated successfully!{' 🎉' * i}</span>", unsafe_allow_html=True)
                         time.sleep(0.3)
                     
                     # Displaying generated messages with animation
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
-                            st.write(f"<div style='border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin: 5px 0;'>{message}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin: 5px 0;'>{message}</div>", unsafe_allow_html=True)
                             time.sleep(0.1)
                     
                     st.text_area("📜 Message Preview", value="\n".join(generated_messages), height=300)
@@ -84,7 +84,7 @@ def main():
                     # Animated success message
                     success_placeholder = st.empty()
                     for i in range(5):
-                        success_placeholder.success(f"<span style='color: #4CAF50;'>🚀{'🚀 ' * i} Spam messages sent successfully!{' 🚀' * i}</span>", unsafe_allow_html=True)
+                        success_placeholder.markdown(f"<span style='color: #4CAF50;'>🚀{'🚀 ' * i} Spam messages sent successfully!{' 🚀' * i}</span>", unsafe_allow_html=True)
                         time.sleep(0.3)
 
 if __name__ == "__main__":
