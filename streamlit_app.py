@@ -4,18 +4,42 @@ from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    if len(cleaned_number) == 10:
-        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
-    return phone_number
+    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
 
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
     for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center;'>{text[:i]}</h1>", unsafe_allow_html=True)
+        placeholder.markdown(f"<h1 style='text-align: center; color: #1f77b4; font-size: 3rem; font-weight: bold; transition: color 0.5s;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro", layout="wide")
+    
+    # Apply custom CSS for better UI
+    st.markdown("""
+    <style>
+    .main { 
+        background-color: #f5f5f5; 
+        padding: 20px;
+    }
+    .section { 
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: #ffffff; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .animated-button {
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .animated-button:hover {
+        transform: scale(1.05);
+        background-color: #d3d3d3;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<div class='main'>", unsafe_allow_html=True)
     
     # Animated title
     animated_text("🚀 Spam Attacker Pro")
@@ -24,6 +48,7 @@ def main():
     col1, col2 = st.columns([1, 2])
     
     with col1:
+        st.markdown("<div class='section'>", unsafe_allow_html=True)
         st.subheader("Configuration")
         raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
         phone_number = format_phone_number(raw_phone_number)
@@ -33,11 +58,14 @@ def main():
         # Create two columns for buttons
         button_col1, button_col2 = st.columns(2)
         with button_col1:
-            generate_button = st.button("🎲 Generate", use_container_width=True)
+            generate_button = st.button("🎲 Generate", use_container_width=True, key="generate_button")
         with button_col2:
-            send_button = st.button('📤 Send', use_container_width=True)
+            send_button = st.button('📤 Send', use_container_width=True, key="send_button")
+        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
+        st.markdown("<div class='section'>", unsafe_allow_html=True)
+        
         # Generate spam messages
         if generate_button:
             if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
@@ -70,7 +98,7 @@ def main():
                 sending_placeholder = st.empty()
                 
                 with st.spinner('📡 Sending spam messages...'):
-                    for i in range(int(num_messages)):
+                    for i in range(num_messages):
                         message = generate_spam_messages(1)[0]  # Generate a single message
                         message_placeholder.markdown(f"**Spam message {i+1}/{num_messages} to Number {phone_number}:**\n\n{message}")
                         
@@ -90,6 +118,8 @@ def main():
                     for i in range(5):
                         success_placeholder.success(f"{'🚀 ' * i}Spam messages sent successfully!{'🚀 ' * i}")
                         time.sleep(0.3)
+                
+        st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
