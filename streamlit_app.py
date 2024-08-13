@@ -20,7 +20,6 @@ def main():
     
     # Animated title
     animated_text("🚀 Spam Attacker Pro")
-    st.subheader("Generate and Send Spam Messages with Style")
     
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
