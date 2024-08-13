@@ -1,14 +1,15 @@
 import streamlit as st
 import random
-from streamlit_extras import st_expander, st_animated_header, st_image_comparison
 from spam_generator import generate_spam_messages
 
 def main():
     st.set_page_config(page_title="Spam Attacker", layout="wide")
 
     # Application Header
-    st_animated_header("Spam Attacker", animation="pulse", color="blue")
+    st.title("Spam Attacker")
+    st.subheader("Generate and Send Spam Messages")
 
+    # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
     st.sidebar.subheader("Configuration")
 
@@ -25,11 +26,15 @@ def main():
                 spam_messages = generate_spam_messages(num_messages)
                 st.success("Spam messages generated successfully.")
                 
-                st.expander("Generated Messages", expanded=True).write("\n".join(spam_messages))
-                st.image_comparison("Message Preview", [spam_messages[0]], ["Sample Message"], use_column_width=True)
+                # Displaying generated messages
+                with st.expander("Generated Messages"):
+                    for message in spam_messages:
+                        st.write(message)
+                st.text_area("Message Preview", value="\n".join(spam_messages), height=300)
 
     st.sidebar.subheader("Settings")
-    st.sidebar.selectbox("Theme", ["Light", "Dark"])
+    theme = st.sidebar.selectbox("Theme", ["Light", "Dark"])
+    st.write(f"Selected Theme: {theme}")
 
 if __name__ == "__main__":
     main()
