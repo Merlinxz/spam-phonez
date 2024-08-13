@@ -12,7 +12,7 @@ def animated_text(text, delay=0.05):
     placeholder = st.empty()
     for i in range(len(text) + 1):
         placeholder.markdown(f"<h1 style='text-align: center;'>{text[:i]}</h1>", unsafe_allow_html=True)
-        time.sleep(delay)
+        st.sleep(delay)  # Using st.sleep for better Streamlit compatibility
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro", layout="wide")
@@ -50,13 +50,13 @@ def main():
                     success_placeholder = st.empty()
                     for i in range(5):
                         success_placeholder.success(f"{'🎉 ' * i}Spam messages generated successfully!{'🎉 ' * i}")
-                        time.sleep(0.3)
+                        st.sleep(0.3)
                     
                     # Displaying generated messages with animation
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
-                            time.sleep(0.1)
+                            st.sleep(0.1)
                     
                     st.text_area("📜 Message Preview", value="\n".join(generated_messages), height=300)
         
@@ -77,7 +77,7 @@ def main():
                         # Animated sending indicator
                         for j in range(3):
                             sending_placeholder.markdown(f"Sending{'.' * (j + 1)}")
-                            time.sleep(delay_between_messages / 3)
+                            st.sleep(delay_between_messages / 3)
                         
                         if i < num_messages - 1:
                             message_placeholder.empty()
@@ -89,7 +89,7 @@ def main():
                     success_placeholder = st.empty()
                     for i in range(5):
                         success_placeholder.success(f"{'🚀 ' * i}Spam messages sent successfully!{'🚀 ' * i}")
-                        time.sleep(0.3)
+                        st.sleep(0.3)
 
 if __name__ == "__main__":
     main()
