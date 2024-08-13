@@ -140,6 +140,13 @@ def main():
                             st.write(message)
     
     with col2:
+        st.subheader("💬 Message Setup")
+        num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
+        delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
+        message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
+        if message_type == "Custom":
+            custom_message = st.text_area("✍️ Enter your custom message template")
+
         if st.button("📤 Send Messages", use_container_width=True):
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
@@ -168,6 +175,7 @@ def main():
                             progress_bar.progress(progress)
                         
                         st.success("✅ Messages sent successfully!")
+                        placeholder.empty()  # Clear the placeholder after sending is complete
                     
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
