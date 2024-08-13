@@ -38,17 +38,13 @@ def main():
             send_button = st.button('📤 Send', use_container_width=True)
     
     with col2:
-        # Session state to persist messages
-        if 'spam_messages' not in st.session_state:
-            st.session_state.spam_messages = []
-        
         # Generate spam messages
         if generate_button:
             if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
                 st.error("❌ Please enter a valid 10-digit phone number.")
             else:
                 with st.spinner("🔄 Generating spam messages..."):
-                    st.session_state.spam_messages = generate_spam_messages(num_messages)
+                    generated_messages = generate_spam_messages(num_messages)
                     
                     # Animated success message
                     success_placeholder = st.empty()
@@ -58,17 +54,15 @@ def main():
                     
                     # Displaying generated messages with animation
                     with st.expander("📝 Generated Messages", expanded=True):
-                        for message in st.session_state.spam_messages:
+                        for message in generated_messages:
                             st.write(message)
                             time.sleep(0.1)
                     
-                    st.text_area("📜 Message Preview", value="\n".join(st.session_state.spam_messages), height=300)
+                    st.text_area("📜 Message Preview", value="\n".join(generated_messages), height=300)
         
         # Send spam messages
         if send_button:
-            if not st.session_state.spam_messages:
-                st.error('❌ No spam messages generated. Please generate messages first.')
-            elif len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
+            if len(raw_phone_number) != 10 or not raw_phone_number.isdigit():
                 st.error('❌ Please enter a valid phone number.')
             else:
                 message_placeholder = st.empty()
@@ -76,19 +70,20 @@ def main():
                 sending_placeholder = st.empty()
                 
                 with st.spinner('📡 Sending spam messages...'):
-                    for i, message in enumerate(st.session_state.spam_messages, start=1):
-                        message_placeholder.markdown(f"**Spam message {i}/{num_messages} to Number {phone_number}:**\n\n{message}")
+                    for i in range(num_messages):
+                        message = generate_spam_messages(1)[0]  # Generate a single message
+                        message_placeholder.markdown(f"**Spam message {i+1}/{num_messages} to Number {phone_number}:**\n\n{message}")
                         
                         # Animated sending indicator
                         for j in range(3):
                             sending_placeholder.markdown(f"Sending{'.' * (j + 1)}")
                             time.sleep(delay_between_messages / 3)
                         
-                        if i < num_messages:
+                        if i < num_messages - 1:
                             message_placeholder.empty()
                             sending_placeholder.empty()
                         
-                        progress_placeholder.progress(i / num_messages)
+                        progress_placeholder.progress((i + 1) / num_messages)
                     
                     # Animated success message
                     success_placeholder = st.empty()
