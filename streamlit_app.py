@@ -24,19 +24,6 @@ def main():
     # Animated title
     animated_text("🚀 Spam Attacker Pro 2.0")
     
-    # Sidebar for configuration
-    st.sidebar.title("⚙️ Configuration")
-    theme = st.sidebar.selectbox("🎨 Theme", ["Light", "Dark"])
-    if theme == "Dark":
-        st.markdown("""
-        <style>
-        .stApp {
-            background-color: #1E1E1E;
-            color: #FFFFFF;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    
     # Create two columns for layout
     col1, col2 = st.columns([1, 2])
     
