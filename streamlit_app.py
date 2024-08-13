@@ -62,24 +62,12 @@ def main():
 
                 st.success('Spam messages sent successfully!')
 
-    # Add watermark
-    st.markdown(
-        """
-        <style>
-        .watermark {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            opacity: 0.3;
-            z-index: 1000;
-        }
-        </style>
-        <div class="watermark">
-            <img src="https://path-to-your-watermark-image/watermark.png" width="150" />
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Add text license at the bottom of the sidebar
+    st.sidebar.markdown("""
+    ---
+    **License:**
+    This is a demonstration application. Use responsibly and in compliance with all relevant laws and regulations.
+    """)
 
 if __name__ == "__main__":
     main()
