@@ -120,6 +120,9 @@ def main():
     
     # Action buttons
     col1, col2, col3 = st.columns(3)
+    
+    generated_messages = []  # Initialize the variable
+    
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
             if not target_numbers:
@@ -142,9 +145,10 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    for message in generated_messages:
-                        st.write(f"📡 Sending: {message}")
-                        time.sleep(delay_between_messages)
+                    progress_bar = st.progress(0)
+                    for i in range(100):
+                        time.sleep(0.05)
+                        progress_bar.progress(i + 1)
                     st.success("✅ Messages sent successfully!")
     
     with col3:
