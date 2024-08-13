@@ -7,17 +7,17 @@ def main():
 
     # Input field for phone number
     phone_number = st.text_input('Enter phone number')
-    
-    # Validate phone number to ensure it's numeric
-    if phone_number and not phone_number.isdigit():
-        st.error('Please enter a valid phone number containing only digits.')
+
+    # Validate phone number to ensure it's numeric and exactly 10 digits long
+    if phone_number and (not phone_number.isdigit() or len(phone_number) != 10):
+        st.error('Please enter a valid phone number containing exactly 10 digits.')
         return
 
     # Input field for spam count
-    spam_count = st.number_input('Number of spam messages', min_value=1, max_value=100, value=1)
+    spam_count = st.number_input('Number of spam messages', min_value=1, max_value=999, value=1)
 
     # Input field for delay between messages
-    delay = st.slider('Delay between messages (seconds)', min_value=1, max_value=5, value=1)
+    delay = st.slider('Delay between messages (seconds)', min_value=1, max_value=50, value=1)
 
     if st.button('Attack'):
         if phone_number:
