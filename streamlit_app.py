@@ -28,7 +28,7 @@ def main():
     # Input fields with improved styling
     raw_phone_number = st.sidebar.text_input("📱 Phone Number (10 digits)", "")
     phone_number = format_phone_number(raw_phone_number)
-    num_messages = st.sidebar.slider("📊 Number of Messages", min_value=1, max_value=100, value=10)
+    num_messages = st.sidebar.slider("📊 Number of Messages", min_value=1, max_value=999999, value=10)
     delay_between_messages = st.sidebar.slider("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=10, value=2)
     
     # Session state to persist messages
