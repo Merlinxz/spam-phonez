@@ -62,12 +62,5 @@ def main():
 
                 st.success('Spam messages sent successfully!')
 
-    # Add text license at the bottom of the sidebar
-    st.sidebar.markdown("""
-    ---
-    **License:**
-    This is a demonstration application. Use responsibly and in compliance with all relevant laws and regulations.
-    """)
-
 if __name__ == "__main__":
     main()
