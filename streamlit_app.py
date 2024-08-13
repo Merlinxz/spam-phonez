@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import random
 import pandas as pd
-from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
@@ -26,8 +25,24 @@ def generate_report(target_numbers, num_messages, message_type):
     df = pd.DataFrame(data)
     return df
 
+def generate_spam_messages(num_messages, message_type):
+    message_templates = [
+        "URGENT: Your account has been locked. Click here to reactivate: {link}",
+        "Congratulations! You've won a free iPhone. Claim now: {link}",
+        "Your package couldn't be delivered. Schedule redelivery: {link}",
+        "Limited time offer: 90% off luxury watches. Shop now: {link}",
+        "Your bank account shows suspicious activity. Verify here: {link}"
+    ]
+    
+    if message_type == "Random":
+        return [random.choice(message_templates).format(link=f"http://spam{random.randint(100,999)}.com") for _ in range(num_messages)]
+    elif message_type == "Sequential":
+        return [template.format(link=f"http://spam{random.randint(100,999)}.com") for template in message_templates * (num_messages // 5 + 1)][:num_messages]
+    else:  # Custom
+        return [message_type.format(link=f"http://spam{random.randint(100,999)}.com") for _ in range(num_messages)]
+
 def main():
-    st.set_page_config(page_title="Spam Attacker Pro 3.1", layout="wide")
+    st.set_page_config(page_title="Spam Attacker Pro 3.2", layout="wide")
     
     # Sidebar for configuration
     st.sidebar.title("⚙️ Configuration")
@@ -43,7 +58,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Animated title
-    animated_text("🚀 Spam Attacker Pro 3.1")
+    animated_text("🚀 Spam Attacker Pro 3.2")
     
     # Main content area
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
@@ -133,7 +148,7 @@ def main():
             else:
                 with st.spinner("🔄 Generating spam messages..."):
                     if message_type == "Custom":
-                        generated_messages = [custom_message] * num_messages
+                        generated_messages = generate_spam_messages(num_messages, custom_message)
                     else:
                         generated_messages = generate_spam_messages(num_messages, message_type)
                     
@@ -160,7 +175,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("📊 Spam Attacker Pro 3.1 - For educational purposes only")
+    st.markdown("📊 Spam Attacker Pro 3.2 - For educational purposes only")
 
 if __name__ == "__main__":
     main()
