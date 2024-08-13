@@ -133,7 +133,7 @@ def main():
                         generated_messages = generate_spam_messages(num_messages, message_type)
                     
                     st.success("✅ Messages generated successfully!")
-                    with st.expander("📝 Generated Messages", expanded=False):
+                    with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
     
@@ -143,12 +143,24 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    messages = generate_spam_messages(num_messages, message_type)
-                    placeholder = st.empty()
+                    if message_type == "Custom":
+                        messages = [custom_message] * num_messages
+                    else:
+                        messages = generate_spam_messages(num_messages, message_type)
+                    
+                    # Simulate sending messages
+                    sent_messages = []
                     for i, message in enumerate(messages):
                         time.sleep(delay_between_messages)
-                        placeholder.markdown(f"📩 Sent to {random.choice(target_numbers)}: {message}")
+                        sent_messages.append(f"📩 Sent to {random.choice(target_numbers)}: {message}")
+                    
                     st.success("✅ Messages sent successfully!")
+                    
+                    # Display sent messages
+                    with st.expander("📬 Sent Messages", expanded=True):
+                        for msg in sent_messages:
+                            st.write(msg)
+
     
     with col3:
         if st.button("💾 Save Campaign", use_container_width=True):
