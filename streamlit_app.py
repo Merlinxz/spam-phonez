@@ -121,8 +121,6 @@ def main():
     # Action buttons
     col1, col2, col3 = st.columns(3)
     
-    generated_messages = []  # Initialize the variable
-    
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
             if not target_numbers:
@@ -141,23 +139,17 @@ def main():
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
-           if not target_numbers:
-            st.error("❌ Please enter at least one valid phone number.")
-           elif not generated_messages:
-            st.error("❌ Please generate messages before sending.")
-           else:
-               with st.spinner("📡 Simulating message sending..."):
-                   progress_bar = st.progress(0)
-                   for i in range(100):
-                       time.sleep(0.05)
-                       progress_bar.progress(i + 1)
-                
-                   st.success("✅ Messages sent successfully!")
-                
-                   with st.expander("📩 Sent Messages", expanded=True):
-                       for i, message in enumerate(generated_messages):
-                           st.write(f"Message {i+1}: {message}")
-
+            if not target_numbers:
+                st.error("❌ Please enter at least one valid phone number.")
+            else:
+                with st.spinner("📡 Simulating message sending..."):
+                    messages = generate_spam_messages(num_messages, message_type)
+                    progress_bar = st.progress(0)
+                    for i, message in enumerate(messages):
+                        time.sleep(delay_between_messages)
+                        progress_bar.progress(int(((i + 1) / num_messages) * 100))
+                        st.write(f"📩 Sent to {random.choice(target_numbers)}: {message}")
+                    st.success("✅ Messages sent successfully!")
     
     with col3:
         if st.button("💾 Save Campaign", use_container_width=True):
@@ -169,4 +161,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
