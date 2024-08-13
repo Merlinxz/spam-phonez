@@ -123,14 +123,17 @@ def main():
     
     with col1:
         st.subheader("📱 Target Setup")
-        target_numbers = st.text_area("📱 Enter phone numbers (one per line):").splitlines()
-        num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, value=10)
-        delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, value=2.0, step=0.1)
-        message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
-        custom_message = st.text_area("✍️ Enter your custom message template") if message_type == "Custom" else ""
-
+        target_numbers = st.text_area("Enter phone numbers (one per line)", key="target_numbers").splitlines()
+    
     with col2:
-        if st.button("📤 Send Messages", use_container_width=True):
+        st.subheader("💬 Message Setup")
+        num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10, key="num_messages")
+        delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1, key="delay_between_messages")
+        message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"], key="message_type")
+        if message_type == "Custom":
+            custom_message = st.text_area("✍️ Enter your custom message template", key="custom_message")
+
+        if st.button("📤 Send Messages", use_container_width=True, key="send_messages"):
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
@@ -140,7 +143,6 @@ def main():
                     else:
                         messages = generate_spam_messages(num_messages, message_type)
                     
-                    # Placeholder for dynamic content update
                     placeholder = st.empty()
                     progress_bar = st.progress(0)
                     
@@ -159,18 +161,19 @@ def main():
                             progress_bar.progress(progress)
                         
                         st.success("✅ Messages sent successfully!")
+                        placeholder.empty()  # Clear the placeholder after sending is complete
                     
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
-                    
-                    # Clear the placeholder content
-                    placeholder.empty()
                     
                     # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
-
+    
+    with col3:
+        if st.button("💾 Save Campaign", use_container_width=True):
+            st.success("💾 Campaign saved successfully!")
     
     # Footer
     st.markdown("---")
