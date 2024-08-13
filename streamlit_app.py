@@ -138,28 +138,39 @@ def main():
                             st.write(message)
     
     with col2:
-     if st.button("📤 Send Messages", use_container_width=True):
-        if not target_numbers:
-            st.error("❌ Please enter at least one valid phone number.")
-        else:
-            with st.spinner("📡 Simulating message sending..."):
-                messages = generate_spam_messages(num_messages, message_type)
-                if not messages:
-                    st.error("❌ No messages generated. Please generate messages first.")
-                else:
-                    placeholder = st.empty()
+        if st.button("📤 Send Messages", use_container_width=True):
+            if not target_numbers:
+                st.error("❌ Please enter at least one valid phone number.")
+            else:
+                with st.spinner("📡 Simulating message sending..."):
+                    if message_type == "Custom":
+                        messages = [custom_message] * num_messages
+                    else:
+                        messages = generate_spam_messages(num_messages, message_type)
+                    
+                    # Initialize sent messages list
+                    sent_messages = []
                     progress_bar = st.progress(0)
-                    total_messages = len(messages)
                     
-                    for i, message in enumerate(messages):
-                        time.sleep(delay_between_messages)
-                        placeholder.markdown(f"📩 Sent to {random.choice(target_numbers)}: {message}")
-                        # Ensure the progress value is between 0 and 100
-                        progress_value = min(max((i + 1) / total_messages * 100, 0), 100)
-                        progress_bar.progress(progress_value)
+                    try:
+                        total_messages = len(messages)
+                        for i, message in enumerate(messages):
+                            time.sleep(delay_between_messages)
+                            # Simulate sending message
+                            sent_messages.append(f"📩 Sent to {random.choice(target_numbers)}: {message}")
+                            # Calculate progress
+                            progress = (i + 1) / total_messages * 100 if total_messages > 0 else 100
+                            progress_bar.progress(progress)
+                        
+                        st.success("✅ Messages sent successfully!")
                     
-                    st.success("✅ Messages sent successfully!")
-
+                    except Exception as e:
+                        st.error(f"❌ An error occurred: {e}")
+                    
+                    # Display sent messages in an expandable box
+                    with st.expander("📬 Sent Messages", expanded=True):
+                        for msg in sent_messages:
+                            st.write(msg)
 
     with col3:
         if st.button("💾 Save Campaign", use_container_width=True):
