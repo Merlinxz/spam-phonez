@@ -17,11 +17,9 @@ def main():
     phone_number = st.sidebar.text_input("Phone Number (10 digits)", "")
     num_messages = st.sidebar.number_input("Number of Messages", min_value=1, max_value=100, value=1)
     delay_between_messages = st.sidebar.slider("Delay Between Messages (seconds)", min_value=1, max_value=5, value=1)
+    
+    spam_messages = []  # Initialize spam_messages as an empty list
 
-    # Variable to store generated messages
-    spam_messages = []
-
-    # Button to generate spam messages
     if st.sidebar.button("Generate Spam Messages"):
         if len(phone_number) != 10 or not phone_number.isdigit():
             st.error("Please enter a valid 10-digit phone number.")
@@ -37,9 +35,11 @@ def main():
                 
                 st.text_area("Message Preview", value="\n".join(spam_messages), height=300)
 
-    # Button to send spam messages
+    # Attack Button
     if st.sidebar.button('Send Spam Messages'):
-        if phone_number and spam_messages:
+        if not spam_messages:
+            st.error('No spam messages generated. Please generate messages first.')
+        elif phone_number:
             # Placeholder for spam messages
             message_placeholder = st.empty()
             progress_placeholder = st.progress(0)  # Placeholder for progress bar
@@ -57,10 +57,7 @@ def main():
 
                 st.success('Spam messages sent successfully!')
         else:
-            if not phone_number:
-                st.error('Please enter a phone number.')
-            if not spam_messages:
-                st.error('No spam messages generated. Please generate messages first.')
+            st.error('Please enter a phone number.')
 
 if __name__ == "__main__":
     main()
