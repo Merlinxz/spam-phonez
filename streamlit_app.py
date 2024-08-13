@@ -142,10 +142,9 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    progress_bar = st.progress(0)
-                    for i in range(100):
-                        time.sleep(0.05)
-                        progress_bar.progress(i + 1)
+                    for message in generated_messages:
+                        st.write(f"📡 Sending: {message}")
+                        time.sleep(delay_between_messages)
                     st.success("✅ Messages sent successfully!")
     
     with col3:
