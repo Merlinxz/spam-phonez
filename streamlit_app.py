@@ -167,6 +167,10 @@ def main():
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                         
+                        # Clear placeholder
+                        placeholder.empty()
+                        
+                        # Show success message
                         st.success("✅ Messages sent successfully!")
                     
                     except Exception as e:
