@@ -27,8 +27,8 @@ def main():
         st.subheader("Configuration")
         raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
         phone_number = format_phone_number(raw_phone_number)
-        num_messages = st.slider("📊 Number of Messages", min_value=1, max_value=999999, value=10)
-        delay_between_messages = st.slider("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
+        num_messages = st.input("📊 Number of Messages", min_value=1, max_value=99999, value=10)
+        delay_between_messages = st.input("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
         
         # Create two columns for buttons
         button_col1, button_col2 = st.columns(2)
