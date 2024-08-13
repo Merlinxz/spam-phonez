@@ -62,5 +62,32 @@ def main():
 
                 st.success('Spam messages sent successfully!')
 
+    st.markdown("""
+        <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            padding: 10px;
+            z-index: 9999;
+            opacity: 0.5;
+        }
+        .footer a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .footer img {
+            width: 40px;
+            height: auto;
+            vertical-align: middle;
+        }
+        </style>
+        <div class="footer">
+            <a href="https://github.com/Merlinxz" target="_blank">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo">
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
+
 if __name__ == "__main__":
     main()
