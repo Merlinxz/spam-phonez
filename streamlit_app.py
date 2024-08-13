@@ -137,7 +137,7 @@ def main():
                         for message in generated_messages:
                             st.write(message)
     
-    with col2:
+        with col2:
         if st.button("📤 Send Messages", use_container_width=True):
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
@@ -150,13 +150,17 @@ def main():
                     
                     # Simulate sending messages
                     sent_messages = []
+                    progress_bar = st.progress(0)
                     for i, message in enumerate(messages):
                         time.sleep(delay_between_messages)
+                        # Simulate sending message
                         sent_messages.append(f"📩 Sent to {random.choice(target_numbers)}: {message}")
+                        # Update progress bar
+                        progress_bar.progress((i + 1) / len(messages) * 100)
                     
                     st.success("✅ Messages sent successfully!")
                     
-                    # Display sent messages
+                    # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
