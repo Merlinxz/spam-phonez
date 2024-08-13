@@ -1,15 +1,6 @@
 import streamlit as st
 import time
 from spam_generator import generate_spam_messages
-from streamlit_extras import st_animated_header, st_lottie
-import requests
-
-def load_lottie_url(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
 
 def format_phone_number(phone_number):
     # Remove any non-digit characters
@@ -22,13 +13,12 @@ def format_phone_number(phone_number):
 def main():
     st.set_page_config(page_title="Spam Attacker", layout="wide")
 
-    # Load Lottie animation
-    lottie_url = "https://assets7.lottiefiles.com/packages/lf20_WtH61L.json"  # Replace with your Lottie file URL
-    lottie_animation = load_lottie_url(lottie_url)
-
-    # Application Header with animation
-    st_animated_header("Spam Attacker", animation=lottie_animation)
+    # Application Header
+    st.title("Spam Attacker")
     st.subheader("Generate and Send Spam Messages")
+
+    # Display a GIF or image for animation
+    st.image("https://media.giphy.com/media/3o6Zt7XopIPmUVDBQ4/giphy.gif", width=300)  # Replace with your GIF or image URL
 
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
