@@ -18,10 +18,10 @@ def main():
     st.set_page_config(page_title="Spam Attacker Pro", layout="wide")
     
     # Animated title
-    animated_text("🚀 Spam Attacker Pro")
+    st.markdown("<div style='text-align: center;'><h1>🚀 Spam Attacker Pro</h1></div>", unsafe_allow_html=True)
     
-    # Create two columns for layout
-    col1, col2 = st.columns([1, 2])
+    # Create layout
+    col1, col2 = st.columns([1, 2], gap="large")
     
     with col1:
         st.subheader("Configuration")
@@ -30,12 +30,11 @@ def main():
         num_messages = st.number_input("📊 Number of Messages", min_value=1, max_value=99999, value=10)
         delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
         
-        # Create two columns for buttons
-        button_col1, button_col2 = st.columns(2)
-        with button_col1:
-            generate_button = st.button("🎲 Generate", use_container_width=True)
-        with button_col2:
-            send_button = st.button('📤 Send', use_container_width=True)
+        # Create buttons
+        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+        generate_button = st.button("🎲 Generate", use_container_width=True)
+        send_button = st.button('📤 Send', use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
         # Generate spam messages
