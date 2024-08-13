@@ -3,6 +3,9 @@ import time
 import random
 from spam_generator import generate_spam_messages
 
+# Set page config at the very beginning
+st.set_page_config(page_title="Spam Attacker Pro", layout="wide", page_icon="🚀")
+
 # Custom CSS for better styling
 st.markdown("""
 <style>
@@ -53,8 +56,6 @@ def loading_animation():
     my_bar.empty()
 
 def main():
-    st.set_page_config(page_title="Spam Attacker Pro", layout="wide", page_icon="🚀")
-    
     # Animated title
     animated_text("🚀 Spam Attacker Pro")
     
