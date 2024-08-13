@@ -133,6 +133,8 @@ def main():
                         generated_messages = generate_spam_messages(num_messages, message_type)
                     
                     st.success("✅ Messages generated successfully!")
+                    
+                    # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
@@ -148,17 +150,20 @@ def main():
                     else:
                         messages = generate_spam_messages(num_messages, message_type)
                     
-                    # Initialize sent messages list
-                    sent_messages = []
+                    placeholder = st.empty()
                     progress_bar = st.progress(0)
                     
                     try:
                         total_messages = len(messages)
+                        sent_messages = []
                         for i, message in enumerate(messages):
                             time.sleep(delay_between_messages)
                             # Simulate sending message
-                            sent_messages.append(f"📩 Sent to {random.choice(target_numbers)}: {message}")
-                            # Calculate progress (as a fraction between 0 and 1)
+                            recipient = random.choice(target_numbers)
+                            sent_message = f"📩 Sent to {recipient}: {message}"
+                            sent_messages.append(sent_message)
+                            # Update placeholder and progress bar
+                            placeholder.markdown(sent_message)
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                         
@@ -171,7 +176,7 @@ def main():
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
-
+    
     with col3:
         if st.button("💾 Save Campaign", use_container_width=True):
             st.success("💾 Campaign saved successfully!")
