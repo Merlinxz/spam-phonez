@@ -9,6 +9,11 @@ def main():
     st.title("Spam Attacker")
     st.subheader("Generate and Send Spam Messages")
 
+    # Add GitHub Badge
+    st.markdown(
+        "![GitHub](https://img.shields.io/github/stars/streamlit/streamlit?style=social)"
+    )
+
     # Sidebar Configuration
     st.sidebar.title("Spam Attacker Options")
     st.sidebar.subheader("Configuration")
