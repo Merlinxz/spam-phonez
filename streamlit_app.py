@@ -4,7 +4,9 @@ from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
+    if len(cleaned_number) == 10:
+        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
+    return phone_number
 
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
@@ -68,7 +70,7 @@ def main():
                 sending_placeholder = st.empty()
                 
                 with st.spinner('📡 Sending spam messages...'):
-                    for i in range(num_messages):
+                    for i in range(int(num_messages)):
                         message = generate_spam_messages(1)[0]  # Generate a single message
                         message_placeholder.markdown(f"**Spam message {i+1}/{num_messages} to Number {phone_number}:**\n\n{message}")
                         
