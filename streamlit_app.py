@@ -4,14 +4,12 @@ from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    if len(cleaned_number) == 10:
-        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
-    return phone_number
+    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
 
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
     for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center; color: #1f77b4;'>{text[:i]}</h1>", unsafe_allow_html=True)
+        placeholder.markdown(f"<h1 style='text-align: center;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
 def main():
@@ -30,14 +28,12 @@ def main():
         num_messages = st.number_input("📊 Number of Messages", min_value=1, max_value=99999, value=10)
         delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=1, max_value=15, value=2)
         
-        # Create buttons in a centered layout
-        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-        generate_button = st.button("🎲 Generate", use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-        send_button = st.button('📤 Send', use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Create two columns for buttons
+        button_col1, button_col2 = st.columns(2)
+        with button_col1:
+            generate_button = st.button("🎲 Generate", use_container_width=True)
+        with button_col2:
+            send_button = st.button('📤 Send', use_container_width=True)
     
     with col2:
         # Generate spam messages
@@ -72,7 +68,7 @@ def main():
                 sending_placeholder = st.empty()
                 
                 with st.spinner('📡 Sending spam messages...'):
-                    for i in range(int(num_messages)):
+                    for i in range(num_messages):
                         message = generate_spam_messages(1)[0]  # Generate a single message
                         message_placeholder.markdown(f"**Spam message {i+1}/{num_messages} to Number {phone_number}:**\n\n{message}")
                         
