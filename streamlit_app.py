@@ -24,10 +24,10 @@ def main():
     # Input fields
     raw_phone_number = st.sidebar.text_input("Phone Number (10 digits)", "")
     phone_number = format_phone_number(raw_phone_number)
-    num_messages = st.sidebar.deley_input("Number of Messages", min_value=1, max_value=100, value=1)
+    num_messages = st.sidebar.number_input("Number of Messages", min_value=1, max_value=100, value=1)
 
     # Input for delay between messages
-    delay_input = st.sidebar.delay_input("Delay Between Messages (seconds)", "1")
+    delay_input = st.sidebar.text_input("Delay Between Messages (seconds)", "1")
     try:
         delay_between_messages = int(delay_input)
         if delay_between_messages < 1:
