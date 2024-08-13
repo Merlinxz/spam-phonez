@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 import random
-import pandas as pd
+from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
@@ -15,34 +15,14 @@ def animated_text(text, delay=0.05):
         placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
-def generate_report(target_numbers, num_messages, message_type):
-    data = {
-        "Phone Number": target_numbers,
-        "Messages Sent": [num_messages] * len(target_numbers),
-        "Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
-        "Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
-    }
-    df = pd.DataFrame(data)
-    return df
-
-def generate_spam_messages(num_messages, message_type):
-    message_templates = [
-        "URGENT: Your account has been locked. Click here to reactivate: {link}",
-        "Congratulations! You've won a free iPhone. Claim now: {link}",
-        "Your package couldn't be delivered. Schedule redelivery: {link}",
-        "Limited time offer: 90% off luxury watches. Shop now: {link}",
-        "Your bank account shows suspicious activity. Verify here: {link}"
-    ]
-    
-    if message_type == "Random":
-        return [random.choice(message_templates).format(link=f"http://spam{random.randint(100,999)}.com") for _ in range(num_messages)]
-    elif message_type == "Sequential":
-        return [template.format(link=f"http://spam{random.randint(100,999)}.com") for template in message_templates * (num_messages // 5 + 1)][:num_messages]
-    else:  # Custom
-        return [message_type.format(link=f"http://spam{random.randint(100,999)}.com") for _ in range(num_messages)]
+def generate_fake_phone_number():
+    return f"{random.randint(100, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}"
 
 def main():
-    st.set_page_config(page_title="Spam Attacker Pro 3.2", layout="wide")
+    st.set_page_config(page_title="Spam Attacker Pro 2.0", layout="wide")
+    
+    # Animated title
+    animated_text("🚀 Spam Attacker Pro 2.0")
     
     # Sidebar for configuration
     st.sidebar.title("⚙️ Configuration")
@@ -57,125 +37,106 @@ def main():
         </style>
         """, unsafe_allow_html=True)
     
-    # Animated title
-    animated_text("🚀 Spam Attacker Pro 3.2")
+    # Create two columns for layout
+    col1, col2 = st.columns([1, 2])
     
-    # Main content area
-    tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
-    
-    with tabs[0]:
-        col1, col2 = st.columns([1, 1])
+    with col1:
+        st.subheader("📊 Message Settings")
+        target_type = st.radio("👤 Target Type", ["Single Number", "Multiple Numbers"])
         
-        with col1:
-            st.subheader("📱 Target Setup")
-            target_type = st.radio("👤 Target Type", ["Single Number", "Multiple Numbers", "Import from CSV"])
-            
-            if target_type == "Single Number":
-                raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
-                target_numbers = [format_phone_number(raw_phone_number)] if raw_phone_number else []
-            elif target_type == "Multiple Numbers":
-                st.write("📱 Enter phone numbers (one per line):")
-                raw_numbers = st.text_area("", height=150)
-                target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if num.strip()]
-            else:
-                uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-                if uploaded_file is not None:
-                    df = pd.read_csv(uploaded_file)
-                    target_numbers = df['Phone Number'].tolist()
-                else:
-                    target_numbers = []
-            
-            st.write(f"Number of target numbers: {len(target_numbers)}")
+        if target_type == "Single Number":
+            raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
+            phone_number = format_phone_number(raw_phone_number)
+        else:
+            num_targets = st.number_input("🎯 Number of Targets", min_value=1, max_value=100, value=5)
+            target_numbers = [generate_fake_phone_number() for _ in range(num_targets)]
+            st.write("Generated Target Numbers:", ", ".join(target_numbers))
         
-        with col2:
-            st.subheader("💬 Message Setup")
-            num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
-            delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
-            message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
-            if message_type == "Custom":
-                custom_message = st.text_area("✍️ Enter your custom message template")
-    
-    with tabs[1]:
-        if 'report_data' not in st.session_state:
-            st.session_state.report_data = None
+        num_messages = st.number_input("📨 Number of Messages", min_value=1, max_value=99999, value=10)
+        delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
         
-        if st.button("📊 Generate Report"):
-            if not target_numbers:
-                st.error("❌ Please enter at least one valid phone number.")
-            else:
-                with st.spinner("Generating report..."):
-                    st.session_state.report_data = generate_report(target_numbers, num_messages, message_type)
-                    st.success("Report generated successfully!")
+        st.subheader("🎛️ Advanced Options")
+        message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
+        if message_type == "Custom":
+            custom_message = st.text_area("✍️ Enter your custom message template")
         
-        if st.session_state.report_data is not None:
-            st.subheader("📊 Campaign Analytics")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.bar_chart(st.session_state.report_data.set_index('Phone Number')['Delivery Rate'])
-                st.write("Message Delivery Rates")
-            with col2:
-                st.scatter_chart(st.session_state.report_data, x='Messages Sent', y='Response Rate')
-                st.write("Response Rates vs Messages Sent")
-            
-            st.subheader("📑 Detailed Report")
-            st.dataframe(st.session_state.report_data)
-    
-    with tabs[2]:
-        st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
             proxy_list = st.text_area("Enter proxy servers (one per line)")
         
-        st.subheader("⏱️ Scheduling")
-        use_schedule = st.checkbox("📅 Schedule Campaign")
-        if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
-        
-        st.subheader("📈 A/B Testing")
-        use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
-        if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
+        # Create two columns for buttons
+        button_col1, button_col2 = st.columns(2)
+        with button_col1:
+            generate_button = st.button("🎲 Generate", use_container_width=True)
+        with button_col2:
+            send_button = st.button('📤 Send', use_container_width=True)
     
-    # Action buttons
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("🎲 Generate Messages", use_container_width=True):
-            if not target_numbers:
-                st.error("❌ Please enter at least one valid phone number.")
+    with col2:
+        # Generate spam messages
+        if generate_button:
+            if target_type == "Single Number" and (len(raw_phone_number) != 10 or not raw_phone_number.isdigit()):
+                st.error("❌ Please enter a valid 10-digit phone number.")
             else:
                 with st.spinner("🔄 Generating spam messages..."):
                     if message_type == "Custom":
-                        generated_messages = generate_spam_messages(num_messages, custom_message)
+                        generated_messages = [custom_message] * num_messages
                     else:
                         generated_messages = generate_spam_messages(num_messages, message_type)
                     
-                    st.success("✅ Messages generated successfully!")
-                    with st.expander("📝 Generated Messages", expanded=False):
+                    # Animated success message
+                    success_placeholder = st.empty()
+                    for i in range(5):
+                        success_placeholder.success(f"{'🎉 ' * i}Spam messages generated successfully!{'🎉 ' * i}")
+                        time.sleep(0.3)
+                    
+                    # Displaying generated messages with animation
+                    with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
-    
-    with col2:
-        if st.button("📤 Send Messages", use_container_width=True):
-            if not target_numbers:
-                st.error("❌ Please enter at least one valid phone number.")
+                            time.sleep(0.1)
+                    
+                    st.text_area("📜 Message Preview", value="\n".join(generated_messages), height=300)
+        
+        # Send spam messages
+        if send_button:
+            if target_type == "Single Number" and (len(raw_phone_number) != 10 or not raw_phone_number.isdigit()):
+                st.error('❌ Please enter a valid phone number.')
             else:
-                with st.spinner("📡 Simulating message sending..."):
-                    progress_bar = st.progress(0)
-                    for i in range(100):
-                        time.sleep(0.05)
-                        progress_bar.progress(i + 1)
-                    st.success("✅ Messages sent successfully!")
-    
-    with col3:
-        if st.button("💾 Save Campaign", use_container_width=True):
-            st.success("💾 Campaign saved successfully!")
+                message_placeholder = st.empty()
+                progress_placeholder = st.progress(0)
+                sending_placeholder = st.empty()
+                
+                with st.spinner('📡 Sending spam messages...'):
+                    total_messages = num_messages * (1 if target_type == "Single Number" else num_targets)
+                    for i in range(total_messages):
+                        message = generate_spam_messages(1, message_type)[0]
+                        if target_type == "Single Number":
+                            target = phone_number
+                        else:
+                            target = random.choice(target_numbers)
+                        
+                        message_placeholder.markdown(f"**Spam message {i+1}/{total_messages} to Number {target}:**\n\n{message}")
+                        
+                        # Animated sending indicator
+                        for j in range(3):
+                            sending_placeholder.markdown(f"Sending{'.' * (j + 1)}")
+                            time.sleep(delay_between_messages / 3)
+                        
+                        if i < total_messages - 1:
+                            message_placeholder.empty()
+                            sending_placeholder.empty()
+                        
+                        progress_placeholder.progress((i + 1) / total_messages)
+                    
+                    # Animated success message
+                    success_placeholder = st.empty()
+                    for i in range(5):
+                        success_placeholder.success(f"{'🚀 ' * i}Spam messages sent successfully!{'🚀 ' * i}")
+                        time.sleep(0.3)
     
     # Footer
     st.markdown("---")
-    st.markdown("📊 Spam Attacker Pro 3.2 - For educational purposes only")
+    st.markdown("📊 Spam Attacker Pro 2.0 - For educational purposes only")
 
 if __name__ == "__main__":
     main()
