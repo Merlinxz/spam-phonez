@@ -11,7 +11,7 @@ def format_phone_number(phone_number):
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
     for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center; color: #1e90ff;'>{text[:i]}</h1>", unsafe_allow_html=True)
+        placeholder.markdown(f"<h1 style='text-align: center;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
 def main():
