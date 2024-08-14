@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import random
 import pandas as pd
-import plotly.express as px
 from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
@@ -142,7 +141,7 @@ def main():
                     # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
-                            st.write(message)
+                            st.write(f"<p style='text-align: center;'>{message}</p>", unsafe_allow_html=True)
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
@@ -190,7 +189,7 @@ def main():
                     # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
-                            st.write(msg)
+                            st.write(f"<p style='text-align: center;'>{msg}</p>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
