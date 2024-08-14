@@ -159,7 +159,7 @@ def main():
                     st.success("✅ Messages sent successfully!")
 
                     with st.expander("📬 Sent Messages", expanded=True):
-                        for msg in sent_messages:
+                        for msg in sent_message:
                             st.write(msg)
 
     # Footer
