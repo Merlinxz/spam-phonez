@@ -18,7 +18,7 @@ def animated_text(text, delay=0.05):
         placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
-def generate_report(target_numbers, num_messages, message_type):
+def generate_report(target_numbers, num_messages,):
     data = {
         "Phone Number": target_numbers,
         "Messages Sent": [num_messages] * len(target_numbers),
