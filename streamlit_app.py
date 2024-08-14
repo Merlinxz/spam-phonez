@@ -17,31 +17,26 @@ def animated_text(text, delay=0.05):
         placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
-def generate_report(target_numbers, num_messages,):
+def generate_report(target_numbers, num_messages):
     data = {
         "Phone Number": target_numbers,
         "Messages Sent": [num_messages] * len(target_numbers),
         "Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
         "Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
     }
-    df = pd.DataFrame(data)
-    return df
+    return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
-    fig = px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
-    return fig
+    return px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
 
 def plot_response_rates(df):
-    fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
-    return fig
+    return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
-    # Animated title
     animated_text("🚀 Spam Attacker Pro 3.0")
     
-    # Main content area
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
     
     with tabs[0]:
@@ -73,8 +68,7 @@ def main():
             num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
             delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
             message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
-            if message_type == "Custom":
-                custom_message = st.text_area("✍️ Enter your custom message template")
+            custom_message = st.text_area("✍️ Enter your custom message template") if message_type == "Custom" else ""
     
     with tabs[1]:
         if 'report_data' not in st.session_state:
@@ -85,7 +79,7 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("Generating report..."):
-                    st.session_state.report_data = generate_report(target_numbers, num_messages, message_type)
+                    st.session_state.report_data = generate_report(target_numbers, num_messages)
                     st.success("Report generated successfully!")
         
         if st.session_state.report_data is not None:
@@ -103,22 +97,19 @@ def main():
         st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
-            proxy_list = st.text_area("Enter proxy servers (one per line)")
+            st.text_area("Enter proxy servers (one per line)")
         
         st.subheader("⏱️ Scheduling")
-        use_schedule = st.checkbox("📅 Schedule Campaign")
-        if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
+        if st.checkbox("📅 Schedule Campaign"):
+            st.date_input("Select start date")
+            st.time_input("Select start time")
         
         st.subheader("📈 A/B Testing")
-        use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
-        if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
+        if st.checkbox("🔬 Enable A/B Testing"):
+            st.text_area("Message A")
+            st.text_area("Message B")
+            st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
-    # Action buttons
     col1, col2 = st.columns(2)
     
     with col1:
@@ -134,7 +125,6 @@ def main():
                     
                     st.success("✅ Messages generated successfully!")
                     
-                    # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
@@ -154,40 +144,32 @@ def main():
                     progress_bar = st.progress(0)
                     countdown_placeholder = st.empty()
                     
+                    total_messages = len(messages)
+                    sent_messages = []
+                    total_time = total_messages * delay_between_messages
+                    
                     try:
-                        total_messages = len(messages)
-                        sent_messages = []
-                        total_time = total_messages * delay_between_messages
-                        
                         for i, message in enumerate(messages):
                             time.sleep(delay_between_messages)
-                            # Simulate sending message
                             recipient = random.choice(target_numbers)
                             sent_message = f"📩 Sent to {recipient}: {message}"
                             sent_messages.append(sent_message)
-                            # Update placeholder and progress bar
                             placeholder.markdown(sent_message)
-                            progress = (i + 1) / total_messages if total_messages > 0 else 1
-                            progress_bar.progress(progress)
+                            progress_bar.progress((i + 1) / total_messages)
                             remaining_time = total_time - (i + 1) * delay_between_messages
                             countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
                         
-                        # Clear placeholder
                         placeholder.empty()
                         countdown_placeholder.empty()
-                        
-                        # Show success message
                         st.success("✅ Messages sent successfully!")
                     
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
                     
-                    # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
     
-    # Footer
     st.markdown("---")
     st.markdown("📊 Spam Attacker Pro 3.0 - For educational purposes only")
 
