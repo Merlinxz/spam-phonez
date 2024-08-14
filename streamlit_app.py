@@ -35,17 +35,19 @@ def plot_response_rates(df):
     fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
     return fig
 
-import time
-
 def countdown_timer(seconds, display_area):
+    start_time = time.time()
+    end_time = start_time + seconds
+    
     while seconds > 0:
-        mins, secs = divmod(seconds, 60)
+        elapsed_time = time.time() - start_time
+        remaining_time = end_time - time.time()
+        mins, secs = divmod(max(int(remaining_time), 0), 60)
         timer = f"{mins:02d}:{secs:02d}"
         display_area.markdown(f"⏳ Time remaining: {timer}")
         time.sleep(1)
         seconds -= 1
     display_area.markdown("✅ Time's up!")
-
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
@@ -146,7 +148,7 @@ def main():
                     
                     # Timer for generating messages
                     countdown_placeholder = st.empty()
-                    countdown_timer(5, countdown_placeholder)  # Adjust time as needed
+                    countdown_timer(10, countdown_placeholder)  # Adjust time as needed
                     
                     st.success("✅ Messages generated successfully!")
                     
