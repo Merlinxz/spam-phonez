@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import json
 import random
 import pandas as pd
 import plotly.express as px
@@ -35,13 +36,31 @@ def plot_response_rates(df):
     fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
     return fig
 
-def save_campaign(campaign_data):
-    # Save campaign data to a file or database
-    pass
+def save_campaign(campaign_data, filename='campaign_data.json'):
+    """Save campaign data to a JSON file."""
+    try:
+        with open(filename, 'w') as file:
+            json.dump(campaign_data, file, indent=4)
+        st.success("Campaign saved successfully!")
+    except Exception as e:
+        st.error(f"An error occurred while saving the campaign: {e}")
 
-def load_campaign():
-    # Load campaign data from a file or database
-    return None
+def load_campaign(filename='campaign_data.json'):
+    """Load campaign data from a JSON file."""
+    try:
+        with open(filename, 'r') as file:
+            campaign_data = json.load(file)
+        st.success("Campaign loaded successfully!")
+        return campaign_data
+    except FileNotFoundError:
+        st.error("Campaign file not found.")
+        return None
+    except json.JSONDecodeError:
+        st.error("Error decoding the campaign file.")
+        return None
+    except Exception as e:
+        st.error(f"An error occurred while loading the campaign: {e}")
+        return None
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
