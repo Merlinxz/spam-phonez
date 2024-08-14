@@ -13,6 +13,15 @@ def format_phone_number(phone_number):
         return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
     return None
 
+def read_phone_numbers_from_file(file, file_type):
+    """Read phone numbers from CSV or TXT file."""
+    if file_type == "csv":
+        df = pd.read_csv(file)
+        return [format_phone_number(num) for num in df['Phone Number'].astype(str)]
+    elif file_type == "txt":
+        return [format_phone_number(line.strip()) for line in file.readlines()]
+    return []
+
 def generate_report(target_numbers, num_messages):
     """Generate a report with delivery and response rates."""
     num_targets = len(target_numbers)
@@ -46,22 +55,32 @@ def main():
         
         with col1:
             st.subheader("📱 Target Setup")
-            target_type = st.radio("👤 Target Type", ["Single Number", "Multiple Numbers", "Import from CSV"])
+            target_type = st.radio("👤 Select Target Type", ["Single Number", "Multiple Numbers", "Import from CSV", "Import from TXT"])
             
             if target_type == "Single Number":
-                raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
+                raw_phone_number = st.text_input("📱 Enter Phone Number (10 digits)", "")
                 target_numbers = [format_phone_number(raw_phone_number)] if format_phone_number(raw_phone_number) else []
             elif target_type == "Multiple Numbers":
                 st.write("📱 Enter phone numbers (one per line):")
-                raw_numbers = st.text_area("", height=150)
+                raw_numbers = st.text_area("📋 Phone Numbers:", height=150)
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if format_phone_number(num.strip())]
-            else:
-                uploaded_file = st.file_uploader("📂 Choose a CSV file", type="csv")
+            elif target_type == "Import from CSV":
+                uploaded_file = st.file_uploader("📂 Upload CSV File", type="csv")
                 if uploaded_file is not None:
-                    df = pd.read_csv(uploaded_file)
-                    target_numbers = [format_phone_number(num) for num in df['Phone Number'].astype(str)]
+                    target_numbers = read_phone_numbers_from_file(uploaded_file, "csv")
                     # Show phone numbers in an expandable box
                     with st.expander("📋 Phone Numbers from CSV", expanded=True):
+                        for number in target_numbers:
+                            if number:
+                                st.write(number)
+                else:
+                    target_numbers = []
+            elif target_type == "Import from TXT":
+                uploaded_file = st.file_uploader("📂 Upload TXT File", type="txt")
+                if uploaded_file is not None:
+                    target_numbers = read_phone_numbers_from_file(uploaded_file, "txt")
+                    # Show phone numbers in an expandable box
+                    with st.expander("📋 Phone Numbers from TXT", expanded=True):
                         for number in target_numbers:
                             if number:
                                 st.write(number)
@@ -76,7 +95,7 @@ def main():
             delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.0, max_value=15.0, value=2.0, step=0.1)
             message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
             if message_type == "Custom":
-                custom_message = st.text_area("✍️ Enter your custom message template")
+                custom_message = st.text_area("✍️ Enter Your Custom Message Template")
     
     with tabs[1]:
         if 'report_data' not in st.session_state:
@@ -86,9 +105,9 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                with st.spinner("🔄 Generating report..."):
+                with st.spinner("🔄 Generating Report..."):
                     st.session_state.report_data = generate_report(target_numbers, num_messages)
-                    st.success("✅ Report generated successfully!")
+                    st.success("✅ Report Generated Successfully!")
         
         if st.session_state.report_data is not None:
             st.subheader("📊 Campaign Analytics")
@@ -105,13 +124,13 @@ def main():
         st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
-            proxy_list = st.text_area("🔗 Enter proxy servers (one per line)")
+            proxy_list = st.text_area("🔗 Enter Proxy Servers (one per line)")
         
         st.subheader("📅 Scheduling")
         use_schedule = st.checkbox("📅 Schedule Campaign")
         if use_schedule:
-            schedule_date = st.date_input("📅 Select start date")
-            schedule_time = st.time_input("🕒 Select start time")
+            schedule_date = st.date_input("📅 Select Start Date")
+            schedule_time = st.time_input("🕒 Select Start Time")
         
         st.subheader("🔬 A/B Testing")
         use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
@@ -128,13 +147,13 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                with st.spinner("🔄 Generating spam messages..."):
+                with st.spinner("🔄 Generating Spam Messages..."):
                     if message_type == "Custom":
                         generated_messages = [custom_message] * num_messages
                     else:
                         generated_messages = generate_spam_messages(num_messages, message_type)
                     
-                    st.success("✅ Messages generated successfully!")
+                    st.success("✅ Messages Generated Successfully!")
                     
                     # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
@@ -148,7 +167,7 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                with st.spinner("📡 Simulating message sending..."):
+                with st.spinner("📡 Simulating Message Sending..."):
                     if message_type == "Custom":
                         messages = [custom_message] * num_messages
                     else:
@@ -174,17 +193,17 @@ def main():
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                             remaining_time = total_time - (i + 1) * delay_between_messages
-                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time remaining: {remaining_time:.1f} seconds</p>", unsafe_allow_html=True)
+                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time Remaining: {remaining_time:.1f} Seconds</p>", unsafe_allow_html=True)
                         
                         # Clear placeholder
                         placeholder.empty()
                         countdown_placeholder.empty()
                         
                         # Show success message
-                        st.success("✅ Messages sent successfully!")
+                        st.success("✅ Messages Sent Successfully!")
                     
                     except Exception as e:
-                        st.error(f"❌ An error occurred: {e}")
+                        st.error(f"❌ An Error Occurred: {e}")
                     
                     # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
@@ -195,7 +214,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("<p style='text-align: center;'>📊 Spam Attacker Pro 3.0 - For educational purposes only</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>📊 Spam Attacker Pro 3.0 - For Educational Purposes Only</p>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
