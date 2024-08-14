@@ -124,7 +124,7 @@ def main():
             split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
     # Action buttons
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1])
     
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
@@ -140,9 +140,11 @@ def main():
                     st.success("✅ Messages generated successfully!")
                     
                     # Display generated messages
+                    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
+                    st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
@@ -188,9 +190,11 @@ def main():
                         st.error(f"❌ An error occurred: {e}")
                     
                     # Display sent messages in an expandable box
+                    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
+                    st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
