@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import time
 import json
 import random
@@ -41,15 +42,25 @@ def save_campaign(campaign_data, filename='campaign_data.json'):
     try:
         with open(filename, 'w') as file:
             json.dump(campaign_data, file, indent=4)
-        st.success("Campaign saved successfully!")
+        st.success(f"Campaign saved successfully! File: {filename}")
+        # Debug output to check file existence
+        if os.path.exists(filename):
+            st.info(f"File {filename} exists.")
+        else:
+            st.warning(f"File {filename} does not exist.")
     except Exception as e:
         st.error(f"An error occurred while saving the campaign: {e}")
 
 def load_campaign(filename='campaign_data.json'):
     """Load campaign data from a JSON file."""
     try:
+        if not os.path.exists(filename):
+            st.error("Campaign file not found.")
+            return None
+        
         with open(filename, 'r') as file:
             campaign_data = json.load(file)
+        
         st.success("Campaign loaded successfully!")
         return campaign_data
     except FileNotFoundError:
