@@ -17,20 +17,20 @@ def generate_report(target_numbers, num_messages):
     """Generate a report with delivery and response rates."""
     num_targets = len(target_numbers)
     data = {
-        "📱 Phone Number": target_numbers,
-        "📨 Messages Sent": [num_messages] * num_targets,
-        "📈 Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
-        "📊 Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
+        "Phone Number": target_numbers,
+        "Messages Sent": [num_messages] * num_targets,
+        "Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
+        "Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
     }
     return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
     """Plot delivery rates."""
-    return px.bar(df, x="📱 Phone Number", y="📈 Delivery Rate", title="📊 Message Delivery Rates")
+    return px.bar(df, x="Phone Number", y="Delivery Rate", title="📈 Message Delivery Rates")
 
 def plot_response_rates(df):
     """Plot response rates versus messages sent."""
-    return px.scatter(df, x="📨 Messages Sent", y="📊 Response Rate", hover_data=["📱 Phone Number"], title="📊 Response Rates vs Messages Sent")
+    return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="📉 Response Rates vs Messages Sent")
 
 def main():
     st.set_page_config(page_title="🚀 Spam Attacker Pro 3.0", layout="wide")
@@ -46,27 +46,36 @@ def main():
         
         with col1:
             st.subheader("📱 Target Setup")
-            target_type = st.radio("👤 Target Type", ["📱 Single Number", "📋 Multiple Numbers", "📂 Import from CSV/TXT"])
+            target_type = st.radio("👤 Target Type", ["Single Number", "Multiple Numbers", "Import from CSV or TXT"])
             
-            if target_type == "📱 Single Number":
+            if target_type == "Single Number":
                 raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
                 target_numbers = [format_phone_number(raw_phone_number)] if format_phone_number(raw_phone_number) else []
-            elif target_type == "📋 Multiple Numbers":
+            elif target_type == "Multiple Numbers":
                 st.write("📱 Enter phone numbers (one per line):")
                 raw_numbers = st.text_area("", height=150)
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if format_phone_number(num.strip())]
             else:
-                uploaded_file = st.file_uploader("📂 Upload CSV/TXT File", type=["csv", "txt"])
-                if uploaded_file is not None:
-                    df = pd.read_csv(uploaded_file)
-                    target_numbers = [format_phone_number(num) for num in df['Phone Number'].astype(str)]
+                uploaded_files = st.file_uploader("📂 Upload CSV or TXT Files", type=["csv", "txt"], accept_multiple_files=True)
+                if uploaded_files and len(uploaded_files) <= 5:
+                    target_numbers = []
+                    for uploaded_file in uploaded_files:
+                        if uploaded_file.type == "text/csv":
+                            df = pd.read_csv(uploaded_file)
+                            target_numbers.extend([format_phone_number(num) for num in df['Phone Number'].astype(str)])
+                        elif uploaded_file.type == "text/plain":
+                            content = uploaded_file.read().decode("utf-8")
+                            numbers = content.splitlines()
+                            target_numbers.extend([format_phone_number(num.strip()) for num in numbers if format_phone_number(num.strip())])
+                    
                     # Show phone numbers in an expandable box
-                    with st.expander("📋 Phone Numbers from CSV/TXT", expanded=True):
+                    with st.expander("📋 Phone Numbers from Files", expanded=True):
                         for number in target_numbers:
                             if number:
                                 st.write(number)
                 else:
                     target_numbers = []
+                    st.error("❌ Please upload a maximum of 5 files.")
             
             st.write(f"📊 Number of target numbers: {len(target_numbers)}")
         
@@ -74,8 +83,8 @@ def main():
             st.subheader("💬 Message Setup")
             num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
             delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.0, max_value=15.0, value=2.0, step=0.1)
-            message_type = st.selectbox("💬 Message Type", ["🎲 Random", "🔢 Sequential", "✍️ Custom"])
-            if message_type == "✍️ Custom":
+            message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
+            if message_type == "Custom":
                 custom_message = st.text_area("✍️ Enter your custom message template")
     
     with tabs[1]:
@@ -86,7 +95,7 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                with st.spinner("🔄 Generating report..."):
+                with st.spinner("Generating report..."):
                     st.session_state.report_data = generate_report(target_numbers, num_messages)
                     st.success("✅ Report generated successfully!")
         
@@ -110,15 +119,15 @@ def main():
         st.subheader("⏱️ Scheduling")
         use_schedule = st.checkbox("📅 Schedule Campaign")
         if use_schedule:
-            schedule_date = st.date_input("📅 Select start date")
-            schedule_time = st.time_input("🕒 Select start time")
+            schedule_date = st.date_input("Select start date")
+            schedule_time = st.time_input("Select start time")
         
         st.subheader("📈 A/B Testing")
         use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
         if use_ab_testing:
-            message_a = st.text_area("💬 Message A")
-            message_b = st.text_area("💬 Message B")
-            split_ratio = st.slider("📊 A/B Split Ratio", 0.0, 1.0, 0.5)
+            message_a = st.text_area("Message A")
+            message_b = st.text_area("Message B")
+            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
     # Action buttons
     col1, col2 = st.columns([1, 1])
@@ -129,7 +138,7 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("🔄 Generating spam messages..."):
-                    if message_type == "✍️ Custom":
+                    if message_type == "Custom":
                         generated_messages = [custom_message] * num_messages
                     else:
                         generated_messages = generate_spam_messages(num_messages, message_type)
@@ -149,7 +158,7 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    if message_type == "✍️ Custom":
+                    if message_type == "Custom":
                         messages = [custom_message] * num_messages
                     else:
                         messages = generate_spam_messages(num_messages, message_type)
@@ -192,7 +201,7 @@ def main():
                         for msg in sent_messages:
                             st.write(msg)
                         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     # Footer
     st.markdown("---")
     st.markdown("<p style='text-align: center;'>📊 Spam Attacker Pro 3.0 - For educational purposes only</p>", unsafe_allow_html=True)
