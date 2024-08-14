@@ -7,30 +7,38 @@ from spam_generator import generate_spam_messages
 
 # Helper Functions
 def format_phone_number(phone_number):
+    """Format phone number to be exactly 10 digits and add dashes."""
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else None
+    if len(cleaned_number) == 10:
+        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
+    return None
 
 def generate_report(target_numbers, num_messages):
+    """Generate a report with delivery and response rates."""
     num_targets = len(target_numbers)
     data = {
-        "📞 Phone Number": target_numbers,
+        "📱 Phone Number": target_numbers,
         "📨 Messages Sent": [num_messages] * num_targets,
         "📈 Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
-        "💬 Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
+        "📉 Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
     }
     return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
-    return px.bar(df, x="📞 Phone Number", y="📈 Delivery Rate", title="🚀 Message Delivery Rates")
+    """Plot delivery rates."""
+    return px.bar(df, x="📱 Phone Number", y="📈 Delivery Rate", title="📊 Message Delivery Rates")
 
 def plot_response_rates(df):
-    return px.scatter(df, x="📨 Messages Sent", y="💬 Response Rate", hover_data=["📞 Phone Number"], title="💬 Response Rates vs Messages Sent")
+    """Plot response rates versus messages sent."""
+    return px.scatter(df, x="📨 Messages Sent", y="📉 Response Rate", hover_data=["📱 Phone Number"], title="📊 Response Rates vs Messages Sent")
 
 def main():
-    st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
+    st.set_page_config(page_title="🚀 Spam Attacker Pro 3.0", layout="wide")
     
+    # Animated title
     st.markdown("<h1 style='text-align: center;'>🚀 Spam Attacker Pro 3.0</h1>", unsafe_allow_html=True)
     
+    # Main content area
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
     
     with tabs[0]:
@@ -44,11 +52,11 @@ def main():
                 raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
                 target_numbers = [format_phone_number(raw_phone_number)] if format_phone_number(raw_phone_number) else []
             elif target_type == "Multiple Numbers":
-                raw_numbers = st.text_area("📱 Enter phone numbers (one per line):", height=150)
+                st.write("📱 Enter phone numbers (one per line):")
+                raw_numbers = st.text_area("", height=150)
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if format_phone_number(num.strip())]
             else:
-                uploaded_files = st.file_uploader("📂 Upload CSV/TXT Files", type=['csv', 'txt'], accept_multiple_files=True)
-                
+                uploaded_files = st.file_uploader("📂 Upload CSV/TXT Files", type=["csv", "txt"], accept_multiple_files=True)
                 if len(uploaded_files) > 5:
                     st.error("❌ You can only upload up to 5 files.")
                     target_numbers = []
@@ -58,17 +66,20 @@ def main():
                     for uploaded_file in uploaded_files:
                         df = pd.read_csv(uploaded_file)
                         target_numbers.extend([format_phone_number(num) for num in df['Phone Number'].astype(str)])
+                        # Collect file details for display
                         file_details.append(f"{uploaded_file.name} {uploaded_file.size / 1024:.1f}KB")
-                    
+
+                    # Display file details in a single line
                     st.write(" | ".join(file_details))
-                    
+
+                    # Show phone numbers in an expandable box
                     with st.expander("📋 Phone Numbers from CSV/TXT", expanded=True):
                         for number in target_numbers:
                             if number:
                                 st.write(number)
                 else:
                     target_numbers = []
-
+            
             st.write(f"📊 Number of target numbers: {len(target_numbers)}")
         
         with col2:
@@ -106,21 +117,22 @@ def main():
         st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
-            proxy_list = st.text_area("Enter proxy servers (one per line)")
+            proxy_list = st.text_area("📝 Enter proxy servers (one per line)")
         
         st.subheader("⏱️ Scheduling")
         use_schedule = st.checkbox("📅 Schedule Campaign")
         if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
+            schedule_date = st.date_input("📅 Select start date")
+            schedule_time = st.time_input("⏰ Select start time")
         
         st.subheader("📈 A/B Testing")
         use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
         if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
+            message_a = st.text_area("🅰️ Message A")
+            message_b = st.text_area("🅱️ Message B")
+            split_ratio = st.slider("🔄 A/B Split Ratio", 0.0, 1.0, 0.5)
     
+    # Action buttons
     col1, col2 = st.columns([1, 1])
     
     with col1:
@@ -129,9 +141,14 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("🔄 Generating spam messages..."):
-                    generated_messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
+                    if message_type == "Custom":
+                        generated_messages = [custom_message] * num_messages
+                    else:
+                        generated_messages = generate_spam_messages(num_messages, message_type)
+                    
                     st.success("✅ Messages generated successfully!")
                     
+                    # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
                         st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                         for message in generated_messages:
@@ -144,7 +161,10 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
+                    if message_type == "Custom":
+                        messages = [custom_message] * num_messages
+                    else:
+                        messages = generate_spam_messages(num_messages, message_type)
                     
                     placeholder = st.empty()
                     progress_bar = st.progress(0)
@@ -157,21 +177,28 @@ def main():
                         
                         for i, message in enumerate(messages):
                             time.sleep(delay_between_messages)
+                            # Simulate sending message
                             recipient = random.choice(target_numbers)
                             sent_message = f"📩 Sent to {recipient}: {message}"
                             sent_messages.append(sent_message)
+                            # Update placeholder and progress bar
                             placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
-                            progress_bar.progress((i + 1) / total_messages)
-                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time remaining: {total_time - (i + 1) * delay_between_messages:.1f} seconds</p>", unsafe_allow_html=True)
+                            progress = (i + 1) / total_messages if total_messages > 0 else 1
+                            progress_bar.progress(progress)
+                            remaining_time = total_time - (i + 1) * delay_between_messages
+                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time remaining: {remaining_time:.1f} seconds</p>", unsafe_allow_html=True)
                         
+                        # Clear placeholder
                         placeholder.empty()
                         countdown_placeholder.empty()
                         
+                        # Show success message
                         st.success("✅ Messages sent successfully!")
                     
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
                     
+                    # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
                         st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                         for msg in sent_messages:
