@@ -80,48 +80,6 @@ def main():
             if message_type == "Custom":
                 custom_message = st.text_area("✍️ Enter your custom message template")
     
-    with tabs[1]:
-        if 'report_data' not in st.session_state:
-            st.session_state.report_data = None
-        
-        if st.button("📊 Generate Report"):
-            if not target_numbers:
-                st.error("❌ Please enter at least one valid phone number.")
-            else:
-                with st.spinner("Generating report..."):
-                    st.session_state.report_data = generate_report(target_numbers, num_messages)
-                    st.success("✅ Report generated successfully!")
-        
-        if st.session_state.report_data is not None:
-            st.subheader("📊 Campaign Analytics")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.plotly_chart(plot_delivery_rates(st.session_state.report_data))
-            with col2:
-                st.plotly_chart(plot_response_rates(st.session_state.report_data))
-            
-            st.subheader("📑 Detailed Report")
-            st.dataframe(st.session_state.report_data)
-    
-    with tabs[2]:
-        st.subheader("🛠️ Advanced Settings")
-        use_proxies = st.checkbox("🔒 Use Proxy Servers")
-        if use_proxies:
-            proxy_list = st.text_area("Enter proxy servers (one per line)")
-        
-        st.subheader("⏱️ Scheduling")
-        use_schedule = st.checkbox("📅 Schedule Campaign")
-        if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
-        
-        st.subheader("📈 A/B Testing")
-        use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
-        if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
-    
     # Action buttons
     col1, col2 = st.columns(2)
     
@@ -137,11 +95,6 @@ def main():
                         generated_messages = generate_spam_messages(num_messages, message_type)
                     
                     st.success("✅ Messages generated successfully!")
-                    
-                    # Display generated messages
-                    with st.expander("📝 Generated Messages", expanded=True):
-                        for message in generated_messages:
-                            st.write(f"<p style='text-align: center;'>{message}</p>", unsafe_allow_html=True)
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
@@ -190,6 +143,21 @@ def main():
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(f"<p style='text-align: center;'>{msg}</p>", unsafe_allow_html=True)
+
+    # Centered messages
+    if 'generated_messages' in locals():
+        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+        st.write("📝 Generated Messages")
+        for message in generated_messages:
+            st.markdown(f"<p style='text-align: center;'>{message}</p>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    if 'sent_messages' in locals():
+        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+        st.write("📬 Sent Messages")
+        for msg in sent_messages:
+            st.markdown(f"<p style='text-align: center;'>{msg}</p>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
