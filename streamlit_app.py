@@ -5,49 +5,38 @@ import pandas as pd
 import plotly.express as px
 from spam_generator import generate_spam_messages
 
+# Helper Functions
 def format_phone_number(phone_number):
+    """Format phone number to be exactly 10 digits and add dashes."""
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
     if len(cleaned_number) == 10:
         return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
-    return ""  # Return an empty string if the phone number is not exactly 10 digits
-
-def animated_text(text, delay=0.05):
-    placeholder = st.empty()
-    for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
-        time.sleep(delay)
+    return None
 
 def generate_report(target_numbers, num_messages):
+    """Generate a report with delivery and response rates."""
+    num_targets = len(target_numbers)
     data = {
         "Phone Number": target_numbers,
-        "Messages Sent": [num_messages] * len(target_numbers),
+        "Messages Sent": [num_messages] * num_targets,
         "Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
         "Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
     }
-    df = pd.DataFrame(data)
-    return df
+    return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
-    fig = px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
-    return fig
+    """Plot delivery rates."""
+    return px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
 
 def plot_response_rates(df):
-    fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
-    return fig
+    """Plot response rates versus messages sent."""
+    return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
-    # Initialize session state for controlling visibility
-    if 'show_generated_messages' not in st.session_state:
-        st.session_state.show_generated_messages = False
-    if 'show_sent_messages' not in st.session_state:
-        st.session_state.show_sent_messages = False
-    if 'report_data' not in st.session_state:
-        st.session_state.report_data = None
-
     # Animated title
-    animated_text("🚀 Spam Attacker Pro 3.0")
+    st.markdown("<h1 style='text-align: center;'>🚀 Spam Attacker Pro 3.0</h1>", unsafe_allow_html=True)
     
     # Main content area
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
@@ -74,7 +63,7 @@ def main():
                     # Show phone numbers in an expandable box
                     with st.expander("📋 Phone Numbers from CSV", expanded=True):
                         for number in target_numbers:
-                            if number:  # Ensure the number is not an empty string
+                            if number:
                                 st.write(number)
                 else:
                     target_numbers = []
@@ -90,22 +79,24 @@ def main():
                 custom_message = st.text_area("✍️ Enter your custom message template")
     
     with tabs[1]:
+        if 'report_data' not in st.session_state:
+            st.session_state.report_data = None
+        
         if st.button("📊 Generate Report"):
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("Generating report..."):
                     st.session_state.report_data = generate_report(target_numbers, num_messages)
-                    st.session_state.show_generated_messages = True
                     st.success("✅ Report generated successfully!")
         
-        if st.session_state.show_generated_messages and st.session_state.report_data is not None:
+        if st.session_state.report_data is not None:
             st.subheader("📊 Campaign Analytics")
             col1, col2 = st.columns(2)
             with col1:
-                st.plotly_chart(plot_delivery_rates(st.session_state.report_data))
+                st.plotly_chart(plot_delivery_rates(st.session_state.report_data), use_container_width=True)
             with col2:
-                st.plotly_chart(plot_response_rates(st.session_state.report_data))
+                st.plotly_chart(plot_response_rates(st.session_state.report_data), use_container_width=True)
             
             st.subheader("📑 Detailed Report")
             st.dataframe(st.session_state.report_data)
@@ -130,14 +121,13 @@ def main():
             split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
     # Action buttons
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1])
     
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                st.session_state.show_sent_messages = False
                 with st.spinner("🔄 Generating spam messages..."):
                     if message_type == "Custom":
                         generated_messages = [custom_message] * num_messages
@@ -148,17 +138,16 @@ def main():
                     
                     # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
+                        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                         for message in generated_messages:
                             st.write(message)
-                    
-                    st.session_state.show_generated_messages = True
+                        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                st.session_state.show_generated_messages = False
                 with st.spinner("📡 Simulating message sending..."):
                     if message_type == "Custom":
                         messages = [custom_message] * num_messages
@@ -193,16 +182,16 @@ def main():
                         
                         # Show success message
                         st.success("✅ Messages sent successfully!")
-                        st.session_state.show_sent_messages = True
                     
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
                     
                     # Display sent messages in an expandable box
-                    if st.session_state.show_sent_messages:
-                        with st.expander("📬 Sent Messages", expanded=True):
-                            for msg in sent_messages:
-                                st.write(msg)
+                    with st.expander("📬 Sent Messages", expanded=True):
+                        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+                        for msg in sent_messages:
+                            st.write(msg)
+                        st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
