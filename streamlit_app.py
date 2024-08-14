@@ -46,7 +46,7 @@ def main():
         
         with col1:
             st.subheader("📱 Target Setup")
-            target_type = st.radio("👤 Select Target Type", ["Single Number", "Multiple Numbers", "Import from CSV", "Import from TXT"])
+            target_type = st.radio("👤 Select Target Type", ["Single Number", "Multiple Numbers", "Import from CSV"])
             
             if target_type == "Single Number":
                 raw_phone_number = st.text_input("📱 Enter Phone Number (10 digits)", "")
@@ -55,25 +55,13 @@ def main():
                 st.write("📱 Enter phone numbers (one per line):")
                 raw_numbers = st.text_area("📋 Phone Numbers:", height=150)
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if format_phone_number(num.strip())]
-            elif target_type == "Import from CSV":
+            else:
                 uploaded_file = st.file_uploader("📂 Upload CSV File", type="csv")
                 if uploaded_file is not None:
                     df = pd.read_csv(uploaded_file)
                     target_numbers = [format_phone_number(num) for num in df['Phone Number'].astype(str)]
                     # Show phone numbers in an expandable box
                     with st.expander("📋 Phone Numbers from CSV", expanded=True):
-                        for number in target_numbers:
-                            if number:
-                                st.write(number)
-                else:
-                    target_numbers = []
-            elif target_type == "Import from TXT":
-                uploaded_file = st.file_uploader("📂 Upload TXT File", type="txt")
-                if uploaded_file is not None:
-                    content = uploaded_file.read().decode("utf-8")
-                    target_numbers = [format_phone_number(num.strip()) for num in content.split('\n') if format_phone_number(num.strip())]
-                    # Show phone numbers in an expandable box
-                    with st.expander("📋 Phone Numbers from TXT", expanded=True):
                         for number in target_numbers:
                             if number:
                                 st.write(number)
