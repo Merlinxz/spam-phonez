@@ -1,5 +1,4 @@
 import streamlit as st
-import os
 import time
 import json
 import random
@@ -19,7 +18,7 @@ def animated_text(text, delay=0.05):
         placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
-def generate_report(target_numbers, num_messages,):
+def generate_report(target_numbers, num_messages, message_type):
     data = {
         "Phone Number": target_numbers,
         "Messages Sent": [num_messages] * len(target_numbers),
@@ -37,42 +36,6 @@ def plot_response_rates(df):
     fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
     return fig
 
-def save_campaign(campaign_data, filename='campaign_data.json'):
-    """Save campaign data to a JSON file."""
-    try:
-        with open(filename, 'w') as file:
-            json.dump(campaign_data, file, indent=4)
-        st.success(f"Campaign saved successfully! File: {filename}")
-        # Debug output to check file existence
-        if os.path.exists(filename):
-            st.info(f"File {filename} exists.")
-        else:
-            st.warning(f"File {filename} does not exist.")
-    except Exception as e:
-        st.error(f"An error occurred while saving the campaign: {e}")
-
-def load_campaign(filename='campaign_data.json'):
-    """Load campaign data from a JSON file."""
-    try:
-        if not os.path.exists(filename):
-            st.error("Campaign file not found.")
-            return None
-        
-        with open(filename, 'r') as file:
-            campaign_data = json.load(file)
-        
-        st.success("Campaign loaded successfully!")
-        return campaign_data
-    except FileNotFoundError:
-        st.error("Campaign file not found.")
-        return None
-    except json.JSONDecodeError:
-        st.error("Error decoding the campaign file.")
-        return None
-    except Exception as e:
-        st.error(f"An error occurred while loading the campaign: {e}")
-        return None
-
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
@@ -80,7 +43,7 @@ def main():
     animated_text("🚀 Spam Attacker Pro 3.0")
     
     # Main content area
-    tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings", "💾 Campaign Management"])
+    tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
     
     with tabs[0]:
         col1, col2 = st.columns([1, 1])
@@ -156,34 +119,8 @@ def main():
             message_b = st.text_area("Message B")
             split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
-    with tabs[3]:
-        st.subheader("💾 Campaign Management")
-        if st.button("📂 Load Campaign"):
-            campaign_data = load_campaign()
-            if campaign_data:
-                st.session_state.target_numbers = campaign_data['target_numbers']
-                st.session_state.num_messages = campaign_data['num_messages']
-                st.session_state.message_type = campaign_data['message_type']
-                st.session_state.custom_message = campaign_data.get('custom_message', '')
-                st.success("Campaign loaded successfully!")
-            else:
-                st.error("❌ No campaign data found.")
-        
-        if st.button("💾 Save Campaign"):
-            if 'target_numbers' in st.session_state and st.session_state.target_numbers:
-                campaign_data = {
-                    'target_numbers': st.session_state.target_numbers,
-                    'num_messages': st.session_state.num_messages,
-                    'message_type': st.session_state.message_type,
-                    'custom_message': st.session_state.get('custom_message', '')
-                }
-                save_campaign(campaign_data)
-                st.success("Campaign saved successfully!")
-            else:
-                st.error("❌ No campaign data to save.")
-    
     # Action buttons
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
@@ -250,10 +187,6 @@ def main():
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
-    
-    with col3:
-        if st.button("💾 Save Campaign", use_container_width=True):
-            st.success("💾 Campaign saved successfully!")
     
     # Footer
     st.markdown("---")
