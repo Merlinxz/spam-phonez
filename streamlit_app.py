@@ -32,6 +32,11 @@ def plot_response_rates(df):
     """Plot response rates versus messages sent."""
     return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
 
+def format_time(seconds):
+    hours, remainder = divmod(int(seconds), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}h {minutes}m {seconds}s"
+
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
@@ -170,11 +175,11 @@ def main():
                             sent_message = f"📩 Sent to {recipient}: {message}"
                             sent_messages.append(sent_message)
                             # Update placeholder and progress bar
-                            placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
+                            placeholder.markdown(sent_message, unsafe_allow_html=True)
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                             remaining_time = total_time - (i + 1) * delay_between_messages
-                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time remaining: {remaining_time:.1f} seconds</p>", unsafe_allow_html=True)
+                            countdown_placeholder.markdown(f"⏳ Time remaining: {format_time(remaining_time)}")
                         
                         # Clear placeholder
                         placeholder.empty()
@@ -188,10 +193,8 @@ def main():
                     
                     # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
-                        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                         for msg in sent_messages:
                             st.write(msg)
-                        st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
