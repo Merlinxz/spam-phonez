@@ -9,9 +9,7 @@ from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    if len(cleaned_number) == 10:
-        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
-    return phone_number
+    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
 
 def animated_text(text, delay=0.05):
     placeholder = st.empty()
@@ -43,27 +41,22 @@ def save_campaign(campaign_data, filename='campaign_data.json'):
         st.error(f"An error occurred while saving the campaign: {e}")
 
 def load_campaign(filename='campaign_data.json'):
-    if not os.path.exists(filename):
-        st.error("Campaign file not found.")
-        return None
-
     try:
+        if not os.path.exists(filename):
+            st.error("Campaign file not found.")
+            return None
+        
         with open(filename, 'r') as file:
             return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        st.error(f"An error occurred: {e}")
+    except Exception as e:
+        st.error(f"An error occurred while loading the campaign: {e}")
         return None
-
-def validate_phone_number(phone_number):
-    return phone_number.isdigit() and len(phone_number) == 10
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
-    # Animated title
     animated_text("🚀 Spam Attacker Pro 3.0")
     
-    # Main content area
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings", "💾 Campaign Management"])
     
     with tabs[0]:
@@ -73,31 +66,18 @@ def main():
             st.subheader("📱 Target Setup")
             target_type = st.radio("👤 Target Type", ["Single Number", "Multiple Numbers", "Import from CSV"])
             
+            target_numbers = []
             if target_type == "Single Number":
                 raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
-                if validate_phone_number(raw_phone_number):
-                    target_numbers = [format_phone_number(raw_phone_number)]
-                else:
-                    st.error("❌ Invalid phone number. Please enter a 10-digit number.")
-                    target_numbers = []
+                target_numbers = [format_phone_number(raw_phone_number)] if raw_phone_number else []
             elif target_type == "Multiple Numbers":
-                st.write("📱 Enter phone numbers (one per line):")
                 raw_numbers = st.text_area("", height=150)
-                target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if validate_phone_number(num.strip())]
-                if not target_numbers:
-                    st.error("❌ No valid phone numbers found.")
-            else:
+                target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if num.strip()]
+            elif target_type == "Import from CSV":
                 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
                 if uploaded_file is not None:
                     df = pd.read_csv(uploaded_file)
-                    if 'Phone Number' in df.columns:
-                        target_numbers = [format_phone_number(num) for num in df['Phone Number'].dropna() if validate_phone_number(num)]
-                        if not target_numbers:
-                            st.error("❌ No valid phone numbers found in CSV.")
-                    else:
-                        st.error("❌ CSV file must contain 'Phone Number' column.")
-                else:
-                    target_numbers = []
+                    target_numbers = df['Phone Number'].tolist()
             
             st.write(f"Number of target numbers: {len(target_numbers)}")
         
@@ -106,8 +86,7 @@ def main():
             num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
             delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
             message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
-            if message_type == "Custom":
-                custom_message = st.text_area("✍️ Enter your custom message template")
+            custom_message = st.text_area("✍️ Enter your custom message template") if message_type == "Custom" else ""
     
     with tabs[1]:
         if 'report_data' not in st.session_state:
@@ -136,29 +115,29 @@ def main():
         st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
-            st.text_area("Enter proxy servers (one per line)", height=150)
+            proxy_list = st.text_area("Enter proxy servers (one per line)")
         
         st.subheader("⏱️ Scheduling")
         use_schedule = st.checkbox("📅 Schedule Campaign")
         if use_schedule:
-            st.date_input("Select start date")
-            st.time_input("Select start time")
+            schedule_date = st.date_input("Select start date")
+            schedule_time = st.time_input("Select start time")
         
         st.subheader("📈 A/B Testing")
         use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
         if use_ab_testing:
-            st.text_area("Message A", height=150)
-            st.text_area("Message B", height=150)
-            st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
+            message_a = st.text_area("Message A")
+            message_b = st.text_area("Message B")
+            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
     with tabs[3]:
         st.subheader("💾 Campaign Management")
         if st.button("📂 Load Campaign"):
             campaign_data = load_campaign()
             if campaign_data:
-                st.session_state.target_numbers = campaign_data.get('target_numbers', [])
-                st.session_state.num_messages = campaign_data.get('num_messages', 10)
-                st.session_state.message_type = campaign_data.get('message_type', 'Random')
+                st.session_state.target_numbers = campaign_data['target_numbers']
+                st.session_state.num_messages = campaign_data['num_messages']
+                st.session_state.message_type = campaign_data['message_type']
                 st.session_state.custom_message = campaign_data.get('custom_message', '')
                 st.success("Campaign loaded successfully!")
             else:
@@ -177,7 +156,6 @@ def main():
             else:
                 st.error("❌ No campaign data to save.")
     
-    # Action buttons
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -186,11 +164,10 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("🔄 Generating spam messages..."):
-                    generated_messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
+                    messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
                     st.success("✅ Messages generated successfully!")
-                    
                     with st.expander("📝 Generated Messages", expanded=True):
-                        for message in generated_messages:
+                        for message in messages:
                             st.write(message)
     
     with col2:
@@ -200,18 +177,35 @@ def main():
             else:
                 with st.spinner("📡 Simulating message sending..."):
                     messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
+                    
                     placeholder = st.empty()
-                    for idx, phone_number in enumerate(target_numbers):
-                        for msg in messages:
-                            placeholder.markdown(f"<h4>Sending to {phone_number}:</h4><p>{msg}</p>", unsafe_allow_html=True)
+                    progress_bar = st.progress(0)
+                    countdown_placeholder = st.empty()
+                    
+                    total_messages = len(messages)
+                    total_time = total_messages * delay_between_messages
+                    sent_messages = []
+                    
+                    try:
+                        for i, message in enumerate(messages):
                             time.sleep(delay_between_messages)
-                        st.write(f"Message sent to {phone_number}!")
-                    st.success("✅ Messages sent successfully!")
-    
-    with col3:
-        if st.button("🔄 Clear Data", use_container_width=True):
-            st.session_state.clear()
-            st.success("🧹 Data cleared successfully!")
+                            recipient = random.choice(target_numbers)
+                            sent_message = f"📩 Sent to {recipient}: {message}"
+                            sent_messages.append(sent_message)
+                            placeholder.markdown(sent_message)
+                            progress_bar.progress((i + 1) / total_messages)
+                            countdown_placeholder.markdown(f"⏳ Time remaining: {total_time - (i + 1) * delay_between_messages:.1f} seconds")
+                        
+                        placeholder.empty()
+                        countdown_placeholder.empty()
+                        st.success("✅ Messages sent successfully!")
+                    
+                    except Exception as e:
+                        st.error(f"❌ An error occurred: {e}")
+                    
+                    with st.expander("📜 Sent Messages", expanded=True):
+                        for sent_message in sent_messages:
+                            st.write(sent_message)
 
 if __name__ == "__main__":
     main()
