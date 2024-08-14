@@ -13,15 +13,6 @@ def format_phone_number(phone_number):
         return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
     return None
 
-def read_phone_numbers_from_file(file, file_type):
-    """Read phone numbers from CSV or TXT file."""
-    if file_type == "csv":
-        df = pd.read_csv(file)
-        return [format_phone_number(num) for num in df['Phone Number'].astype(str)]
-    elif file_type == "txt":
-        return [format_phone_number(line.strip()) for line in file.readlines()]
-    return []
-
 def generate_report(target_numbers, num_messages):
     """Generate a report with delivery and response rates."""
     num_targets = len(target_numbers)
@@ -67,7 +58,8 @@ def main():
             elif target_type == "Import from CSV":
                 uploaded_file = st.file_uploader("📂 Upload CSV File", type="csv")
                 if uploaded_file is not None:
-                    target_numbers = read_phone_numbers_from_file(uploaded_file, "csv")
+                    df = pd.read_csv(uploaded_file)
+                    target_numbers = [format_phone_number(num) for num in df['Phone Number'].astype(str)]
                     # Show phone numbers in an expandable box
                     with st.expander("📋 Phone Numbers from CSV", expanded=True):
                         for number in target_numbers:
@@ -78,7 +70,8 @@ def main():
             elif target_type == "Import from TXT":
                 uploaded_file = st.file_uploader("📂 Upload TXT File", type="txt")
                 if uploaded_file is not None:
-                    target_numbers = read_phone_numbers_from_file(uploaded_file, "txt")
+                    content = uploaded_file.read().decode("utf-8")
+                    target_numbers = [format_phone_number(num.strip()) for num in content.split('\n') if format_phone_number(num.strip())]
                     # Show phone numbers in an expandable box
                     with st.expander("📋 Phone Numbers from TXT", expanded=True):
                         for number in target_numbers:
