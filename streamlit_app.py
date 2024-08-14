@@ -152,12 +152,23 @@ def main():
                     
                     placeholder = st.empty()
                     progress_bar = st.progress(0)
+                    countdown_placeholder = st.empty()
                     
                     try:
                         total_messages = len(messages)
                         sent_messages = []
+                        total_delay = total_messages * delay_between_messages
+                        
                         for i, message in enumerate(messages):
-                            time.sleep(delay_between_messages)
+                            start_time = time.time()
+                            time_elapsed = 0
+                            
+                            while time_elapsed < delay_between_messages:
+                                remaining_time = delay_between_messages - time_elapsed
+                                countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
+                                time.sleep(1)
+                                time_elapsed = time.time() - start_time
+                            
                             # Simulate sending message
                             recipient = random.choice(target_numbers)
                             sent_message = f"📩 Sent to {recipient}: {message}"
@@ -167,8 +178,9 @@ def main():
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                         
-                        # Clear placeholder
+                        # Clear placeholders
                         placeholder.empty()
+                        countdown_placeholder.empty()
                         
                         # Show success message
                         st.success("✅ Messages sent successfully!")
