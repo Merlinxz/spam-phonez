@@ -35,12 +35,6 @@ def plot_response_rates(df):
     fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
     return fig
 
-def countdown_timer(seconds, placeholder):
-    for i in range(seconds, 0, -1):
-        placeholder.markdown(f"⏳ Time remaining: {i} seconds")
-        time.sleep(1)
-    placeholder.markdown("✅ Done!")
-
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
     
@@ -90,9 +84,7 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                countdown_placeholder = st.empty()
                 with st.spinner("Generating report..."):
-                    countdown_timer(10, countdown_placeholder)  # Adjust time as needed
                     st.session_state.report_data = generate_report(target_numbers, num_messages, message_type)
                     st.success("Report generated successfully!")
         
@@ -134,9 +126,7 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                countdown_placeholder = st.empty()
                 with st.spinner("🔄 Generating spam messages..."):
-                    countdown_timer(10, countdown_placeholder)  # Adjust time as needed
                     if message_type == "Custom":
                         generated_messages = [custom_message] * num_messages
                     else:
@@ -154,9 +144,7 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                countdown_placeholder = st.empty()
                 with st.spinner("📡 Simulating message sending..."):
-                    countdown_timer(10, countdown_placeholder)  # Adjust time as needed
                     if message_type == "Custom":
                         messages = [custom_message] * num_messages
                     else:
@@ -203,3 +191,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+add show time countdonw for all
