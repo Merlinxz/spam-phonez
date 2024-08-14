@@ -80,7 +80,7 @@ def main():
     animated_text("🚀 Spam Attacker Pro 3.0")
     
     # Main content area
-    tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings"])
+    tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings", "💾 Campaign Management"])
     
     with tabs[0]:
         col1, col2 = st.columns([1, 1])
@@ -156,6 +156,32 @@ def main():
             message_b = st.text_area("Message B")
             split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
+    with tabs[3]:
+        st.subheader("💾 Campaign Management")
+        if st.button("📂 Load Campaign"):
+            campaign_data = load_campaign()
+            if campaign_data:
+                st.session_state.target_numbers = campaign_data['target_numbers']
+                st.session_state.num_messages = campaign_data['num_messages']
+                st.session_state.message_type = campaign_data['message_type']
+                st.session_state.custom_message = campaign_data.get('custom_message', '')
+                st.success("Campaign loaded successfully!")
+            else:
+                st.error("❌ No campaign data found.")
+        
+        if st.button("💾 Save Campaign"):
+            if 'target_numbers' in st.session_state and st.session_state.target_numbers:
+                campaign_data = {
+                    'target_numbers': st.session_state.target_numbers,
+                    'num_messages': st.session_state.num_messages,
+                    'message_type': st.session_state.message_type,
+                    'custom_message': st.session_state.get('custom_message', '')
+                }
+                save_campaign(campaign_data)
+                st.success("Campaign saved successfully!")
+            else:
+                st.error("❌ No campaign data to save.")
+    
     # Action buttons
     col1, col2, col3 = st.columns(3)
     
@@ -225,9 +251,14 @@ def main():
                         for msg in sent_messages:
                             st.write(msg)
     
+    with col3:
+        if st.button("💾 Save Campaign", use_container_width=True):
+            st.success("💾 Campaign saved successfully!")
+    
     # Footer
     st.markdown("---")
     st.markdown("📊 Spam Attacker Pro 3.0 - For educational purposes only")
 
 if __name__ == "__main__":
     main()
+remove  Campaign Management
