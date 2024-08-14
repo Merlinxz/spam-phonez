@@ -91,7 +91,7 @@ def main():
             else:
                 with st.spinner("Generating report..."):
                     st.session_state.report_data = generate_report(target_numbers, num_messages)
-                    st.success("Report generated successfully!")
+                    st.success("✅ Report generated successfully!")
         
         if st.session_state.report_data is not None:
             st.subheader("📊 Campaign Analytics")
@@ -124,7 +124,7 @@ def main():
             split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
     # Action buttons
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns(2)
     
     with col1:
         if st.button("🎲 Generate Messages", use_container_width=True):
@@ -140,11 +140,9 @@ def main():
                     st.success("✅ Messages generated successfully!")
                     
                     # Display generated messages
-                    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                     with st.expander("📝 Generated Messages", expanded=True):
                         for message in generated_messages:
                             st.write(message)
-                    st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
@@ -173,11 +171,11 @@ def main():
                             sent_message = f"📩 Sent to {recipient}: {message}"
                             sent_messages.append(sent_message)
                             # Update placeholder and progress bar
-                            placeholder.markdown(sent_message)
+                            placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
                             remaining_time = total_time - (i + 1) * delay_between_messages
-                            countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
+                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time remaining: {remaining_time:.1f} seconds</p>", unsafe_allow_html=True)
                         
                         # Clear placeholder
                         placeholder.empty()
@@ -190,15 +188,13 @@ def main():
                         st.error(f"❌ An error occurred: {e}")
                     
                     # Display sent messages in an expandable box
-                    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
                     with st.expander("📬 Sent Messages", expanded=True):
                         for msg in sent_messages:
                             st.write(msg)
-                    st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
-    st.markdown("📊 Spam Attacker Pro 3.0 - For educational purposes only")
+    st.markdown("<p style='text-align: center;'>📊 Spam Attacker Pro 3.0 - For educational purposes only</p>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
