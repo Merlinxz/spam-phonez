@@ -81,48 +81,6 @@ def main():
             if message_type == "Custom":
                 custom_message = st.text_area("✍️ Enter your custom message template")
     
-    with tabs[1]:
-        if 'report_data' not in st.session_state:
-            st.session_state.report_data = None
-        
-        if st.button("📊 Generate Report"):
-            if not target_numbers:
-                st.error("❌ Please enter at least one valid phone number.")
-            else:
-                with st.spinner("Generating report..."):
-                    st.session_state.report_data = generate_report(target_numbers, num_messages)
-                    st.success("✅ Report generated successfully!")
-        
-        if st.session_state.report_data is not None:
-            st.subheader("📊 Campaign Analytics")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.plotly_chart(plot_delivery_rates(st.session_state.report_data))
-            with col2:
-                st.plotly_chart(plot_response_rates(st.session_state.report_data))
-            
-            st.subheader("📑 Detailed Report")
-            st.dataframe(st.session_state.report_data)
-    
-    with tabs[2]:
-        st.subheader("🛠️ Advanced Settings")
-        use_proxies = st.checkbox("🔒 Use Proxy Servers")
-        if use_proxies:
-            proxy_list = st.text_area("Enter proxy servers (one per line)")
-        
-        st.subheader("⏱️ Scheduling")
-        use_schedule = st.checkbox("📅 Schedule Campaign")
-        if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
-        
-        st.subheader("📈 A/B Testing")
-        use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
-        if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
-    
     # Action buttons
     col1, col2 = st.columns(2)
     
@@ -131,17 +89,20 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
+                # Clear previously displayed content
+                st.session_state.generated_messages = []
+                st.session_state.sent_messages = []
                 with st.spinner("🔄 Generating spam messages..."):
                     if message_type == "Custom":
-                        generated_messages = [custom_message] * num_messages
+                        st.session_state.generated_messages = [custom_message] * num_messages
                     else:
-                        generated_messages = generate_spam_messages(num_messages, message_type)
+                        st.session_state.generated_messages = generate_spam_messages(num_messages, message_type)
                     
                     st.success("✅ Messages generated successfully!")
                     
                     # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
-                        for message in generated_messages:
+                        for message in st.session_state.generated_messages:
                             st.write(message)
     
     with col2:
@@ -149,6 +110,9 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
+                # Clear previously displayed content
+                st.session_state.sent_messages = []
+                st.session_state.generated_messages = []  # Clear generated messages if sending messages
                 with st.spinner("📡 Simulating message sending..."):
                     if message_type == "Custom":
                         messages = [custom_message] * num_messages
@@ -161,7 +125,6 @@ def main():
                     
                     try:
                         total_messages = len(messages)
-                        sent_messages = []
                         total_time = total_messages * delay_between_messages
                         
                         for i, message in enumerate(messages):
@@ -169,7 +132,7 @@ def main():
                             # Simulate sending message
                             recipient = random.choice(target_numbers)
                             sent_message = f"📩 Sent to {recipient}: {message}"
-                            sent_messages.append(sent_message)
+                            st.session_state.sent_messages.append(sent_message)
                             # Update placeholder and progress bar
                             placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
@@ -189,7 +152,7 @@ def main():
                     
                     # Display sent messages in an expandable box
                     with st.expander("📬 Sent Messages", expanded=True):
-                        for msg in sent_messages:
+                        for msg in st.session_state.sent_messages:
                             st.write(msg)
     
     # Footer
