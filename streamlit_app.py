@@ -60,6 +60,10 @@ def main():
                     target_numbers = df['Phone Number'].tolist()
                     st.write(f"File name: {uploaded_file.name}")
                     st.write(f"Number of rows: {df.shape[0]}")
+                    
+                    # Display the first few phone numbers from the file
+                    st.write("📄 Phone Numbers in CSV:")
+                    st.dataframe(df.head())  # Show the first few rows of the dataframe
                 else:
                     target_numbers = []
             
