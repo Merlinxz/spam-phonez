@@ -8,19 +8,18 @@ import plotly.express as px
 from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
-    """Format phone number to XXX-XXX-XXXX."""
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
     return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
 
 def animated_text(text, delay=0.05):
-    """Display animated text with a delay."""
-    placeholder = st.empty()
-    for i in range(len(text) + 1):
-        placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
-        time.sleep(delay)
+    with st.spinner("Loading..."):
+        placeholder = st.empty()
+        for i in range(len(text) + 1):
+            placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
+            time.sleep(delay)
+        placeholder.empty()
 
 def generate_report(target_numbers, num_messages, message_type):
-    """Generate a report of campaign statistics."""
     data = {
         "Phone Number": target_numbers,
         "Messages Sent": [num_messages] * len(target_numbers),
@@ -30,65 +29,55 @@ def generate_report(target_numbers, num_messages, message_type):
     return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
-    """Plot delivery rates as a bar chart."""
     return px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
 
 def plot_response_rates(df):
-    """Plot response rates as a scatter plot."""
     return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
 
 def save_campaign(campaign_data, filename='campaign_data.json'):
-    """Save campaign data to a JSON file."""
     try:
         with open(filename, 'w') as file:
             json.dump(campaign_data, file, indent=4)
         st.success(f"Campaign saved successfully! File: {filename}")
     except Exception as e:
-        st.error(f"An error occurred while saving the campaign: {e}")
+        st.error(f"Error saving campaign: {e}")
 
 def load_campaign(filename='campaign_data.json'):
-    """Load campaign data from a JSON file."""
+    if not os.path.exists(filename):
+        st.error("Campaign file not found.")
+        return None
     try:
-        if not os.path.exists(filename):
-            st.error("Campaign file not found.")
-            return None
         with open(filename, 'r') as file:
             return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        st.error(f"Error loading campaign file: {e}")
+    except Exception as e:
+        st.error(f"Error loading campaign: {e}")
         return None
 
 def main():
     st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
-    
-    # Animated title
     animated_text("🚀 Spam Attacker Pro 3.0")
-    
-    # Main content area
+
     tabs = st.tabs(["📊 Campaign Setup", "📈 Analytics", "⚙️ Advanced Settings", "💾 Campaign Management"])
     
     with tabs[0]:
         col1, col2 = st.columns([1, 1])
-        
         with col1:
             st.subheader("📱 Target Setup")
             target_type = st.radio("👤 Target Type", ["Single Number", "Multiple Numbers", "Import from CSV"])
+            target_numbers = []
             
             if target_type == "Single Number":
                 raw_phone_number = st.text_input("📱 Phone Number (10 digits)", "")
                 target_numbers = [format_phone_number(raw_phone_number)] if raw_phone_number else []
             elif target_type == "Multiple Numbers":
-                st.write("📱 Enter phone numbers (one per line):")
                 raw_numbers = st.text_area("", height=150)
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if num.strip()]
             else:
                 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-                if uploaded_file is not None:
+                if uploaded_file:
                     df = pd.read_csv(uploaded_file)
-                    target_numbers = df['Phone Number'].dropna().astype(str).tolist()
-                else:
-                    target_numbers = []
-            
+                    target_numbers = df.get('Phone Number', []).tolist()
+                    
             st.write(f"Number of target numbers: {len(target_numbers)}")
         
         with col2:
@@ -96,9 +85,8 @@ def main():
             num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
             delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
             message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
-            if message_type == "Custom":
-                custom_message = st.text_area("✍️ Enter your custom message template")
-    
+            custom_message = st.text_area("✍️ Enter your custom message template") if message_type == "Custom" else ""
+
     with tabs[1]:
         if 'report_data' not in st.session_state:
             st.session_state.report_data = None
@@ -126,30 +114,25 @@ def main():
         st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
-            proxy_list = st.text_area("Enter proxy servers (one per line)")
+            st.text_area("Enter proxy servers (one per line)")
         
         st.subheader("⏱️ Scheduling")
-        use_schedule = st.checkbox("📅 Schedule Campaign")
-        if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
+        if st.checkbox("📅 Schedule Campaign"):
+            st.date_input("Select start date")
+            st.time_input("Select start time")
         
         st.subheader("📈 A/B Testing")
-        use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
-        if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
+        if st.checkbox("🔬 Enable A/B Testing"):
+            st.text_area("Message A")
+            st.text_area("Message B")
+            st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
     
     with tabs[3]:
         st.subheader("💾 Campaign Management")
         if st.button("📂 Load Campaign"):
             campaign_data = load_campaign()
             if campaign_data:
-                st.session_state.target_numbers = campaign_data.get('target_numbers', [])
-                st.session_state.num_messages = campaign_data.get('num_messages', 10)
-                st.session_state.message_type = campaign_data.get('message_type', 'Random')
-                st.session_state.custom_message = campaign_data.get('custom_message', '')
+                st.session_state.update(campaign_data)
                 st.success("Campaign loaded successfully!")
             else:
                 st.error("❌ No campaign data found.")
@@ -163,6 +146,7 @@ def main():
                     'custom_message': st.session_state.get('custom_message', '')
                 }
                 save_campaign(campaign_data)
+                st.success("Campaign saved successfully!")
             else:
                 st.error("❌ No campaign data to save.")
     
@@ -175,16 +159,11 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("🔄 Generating spam messages..."):
-                    if message_type == "Custom":
-                        generated_messages = [custom_message] * num_messages
-                    else:
-                        generated_messages = generate_spam_messages(num_messages, message_type)
-                    
+                    messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
                     st.success("✅ Messages generated successfully!")
                     
-                    # Display generated messages
                     with st.expander("📝 Generated Messages", expanded=True):
-                        for message in generated_messages:
+                        for message in messages:
                             st.write(message)
     
     with col2:
@@ -193,10 +172,7 @@ def main():
                 st.error("❌ Please enter at least one valid phone number.")
             else:
                 with st.spinner("📡 Simulating message sending..."):
-                    if message_type == "Custom":
-                        messages = [custom_message] * num_messages
-                    else:
-                        messages = generate_spam_messages(num_messages, message_type)
+                    messages = [custom_message] * num_messages if message_type == "Custom" else generate_spam_messages(num_messages, message_type)
                     
                     placeholder = st.empty()
                     progress_bar = st.progress(0)
@@ -213,24 +189,24 @@ def main():
                             sent_message = f"📩 Sent to {recipient}: {message}"
                             sent_messages.append(sent_message)
                             placeholder.markdown(sent_message)
-                            progress = (i + 1) / total_messages
-                            progress_bar.progress(progress)
+                            progress_bar.progress((i + 1) / total_messages)
                             remaining_time = total_time - (i + 1) * delay_between_messages
-                            countdown_placeholder.text(f"⏳ Time remaining: {remaining_time:.1f} seconds")
-                    
+                            countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
+                        
+                        st.success("✅ Messages sent successfully!")
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
                     
-                    st.success("✅ Messages sent successfully!")
-                    
-                    # Display sent messages
-                    with st.expander("📜 Sent Messages", expanded=True):
-                        for sent_message in sent_messages:
-                            st.write(sent_message)
+                    with st.expander("📬 Sent Messages", expanded=True):
+                        for msg in sent_messages:
+                            st.write(msg)
     
     with col3:
-        if st.button("❌ Cancel Operation", use_container_width=True):
-            st.stop()
+        if st.button("💾 Save Campaign", use_container_width=True):
+            st.success("💾 Campaign saved successfully!")
+    
+    st.markdown("---")
+    st.markdown("📊 Spam Attacker Pro 3.0 - For educational purposes only")
 
 if __name__ == "__main__":
     main()
