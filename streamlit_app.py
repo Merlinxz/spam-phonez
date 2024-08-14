@@ -157,18 +157,10 @@ def main():
                     try:
                         total_messages = len(messages)
                         sent_messages = []
-                        total_delay = total_messages * delay_between_messages
+                        total_time = total_messages * delay_between_messages
                         
                         for i, message in enumerate(messages):
-                            start_time = time.time()
-                            time_elapsed = 0
-                            
-                            while time_elapsed < delay_between_messages:
-                                remaining_time = delay_between_messages - time_elapsed
-                                countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
-                                time.sleep(1)
-                                time_elapsed = time.time() - start_time
-                            
+                            time.sleep(delay_between_messages)
                             # Simulate sending message
                             recipient = random.choice(target_numbers)
                             sent_message = f"📩 Sent to {recipient}: {message}"
@@ -177,8 +169,10 @@ def main():
                             placeholder.markdown(sent_message)
                             progress = (i + 1) / total_messages if total_messages > 0 else 1
                             progress_bar.progress(progress)
+                            remaining_time = total_time - (i + 1) * delay_between_messages
+                            countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
                         
-                        # Clear placeholders
+                        # Clear placeholder
                         placeholder.empty()
                         countdown_placeholder.empty()
                         
