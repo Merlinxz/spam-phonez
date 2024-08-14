@@ -27,11 +27,11 @@ def generate_report(target_numbers, num_messages):
     return df
 
 def plot_delivery_rates(df):
-    fig = px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
+    fig = px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates") # type: ignore
     return fig
 
 def plot_response_rates(df):
-    fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
+    fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent") # type: ignore
     return fig
 
 def main():
