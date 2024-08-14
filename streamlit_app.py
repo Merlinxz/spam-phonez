@@ -63,6 +63,11 @@ def main():
                 if uploaded_file is not None:
                     df = pd.read_csv(uploaded_file)
                     target_numbers = [format_phone_number(num) for num in df['Phone Number'].astype(str)]
+                    # Show phone numbers in an expandable box
+                    with st.expander("📋 Phone Numbers from CSV", expanded=True):
+                        for number in target_numbers:
+                            if number:  # Ensure the number is not an empty string
+                                st.write(number)
                 else:
                     target_numbers = []
             
