@@ -8,34 +8,34 @@ import plotly.express as px
 from spam_generator import generate_spam_messages
 
 def format_phone_number(phone_number):
+    """Format phone number to XXX-XXX-XXXX."""
     cleaned_number = ''.join(filter(str.isdigit, phone_number))
-    if len(cleaned_number) == 10:
-        return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}"
-    return phone_number
+    return f"{cleaned_number[:3]}-{cleaned_number[3:6]}-{cleaned_number[6:]}" if len(cleaned_number) == 10 else phone_number
 
 def animated_text(text, delay=0.05):
+    """Display animated text with a delay."""
     placeholder = st.empty()
     for i in range(len(text) + 1):
         placeholder.markdown(f"<h1 style='text-align: center; color: #FF4B4B;'>{text[:i]}</h1>", unsafe_allow_html=True)
         time.sleep(delay)
 
 def generate_report(target_numbers, num_messages, message_type):
+    """Generate a report of campaign statistics."""
     data = {
         "Phone Number": target_numbers,
         "Messages Sent": [num_messages] * len(target_numbers),
         "Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
         "Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
     }
-    df = pd.DataFrame(data)
-    return df
+    return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
-    fig = px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
-    return fig
+    """Plot delivery rates as a bar chart."""
+    return px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
 
 def plot_response_rates(df):
-    fig = px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
-    return fig
+    """Plot response rates as a scatter plot."""
+    return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
 
 def save_campaign(campaign_data, filename='campaign_data.json'):
     """Save campaign data to a JSON file."""
@@ -43,11 +43,6 @@ def save_campaign(campaign_data, filename='campaign_data.json'):
         with open(filename, 'w') as file:
             json.dump(campaign_data, file, indent=4)
         st.success(f"Campaign saved successfully! File: {filename}")
-        # Debug output to check file existence
-        if os.path.exists(filename):
-            st.info(f"File {filename} exists.")
-        else:
-            st.warning(f"File {filename} does not exist.")
     except Exception as e:
         st.error(f"An error occurred while saving the campaign: {e}")
 
@@ -57,20 +52,10 @@ def load_campaign(filename='campaign_data.json'):
         if not os.path.exists(filename):
             st.error("Campaign file not found.")
             return None
-        
         with open(filename, 'r') as file:
-            campaign_data = json.load(file)
-        
-        st.success("Campaign loaded successfully!")
-        return campaign_data
-    except FileNotFoundError:
-        st.error("Campaign file not found.")
-        return None
-    except json.JSONDecodeError:
-        st.error("Error decoding the campaign file.")
-        return None
-    except Exception as e:
-        st.error(f"An error occurred while loading the campaign: {e}")
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        st.error(f"Error loading campaign file: {e}")
         return None
 
 def main():
@@ -100,7 +85,7 @@ def main():
                 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
                 if uploaded_file is not None:
                     df = pd.read_csv(uploaded_file)
-                    target_numbers = df['Phone Number'].tolist()
+                    target_numbers = df['Phone Number'].dropna().astype(str).tolist()
                 else:
                     target_numbers = []
             
@@ -161,9 +146,9 @@ def main():
         if st.button("📂 Load Campaign"):
             campaign_data = load_campaign()
             if campaign_data:
-                st.session_state.target_numbers = campaign_data['target_numbers']
-                st.session_state.num_messages = campaign_data['num_messages']
-                st.session_state.message_type = campaign_data['message_type']
+                st.session_state.target_numbers = campaign_data.get('target_numbers', [])
+                st.session_state.num_messages = campaign_data.get('num_messages', 10)
+                st.session_state.message_type = campaign_data.get('message_type', 'Random')
                 st.session_state.custom_message = campaign_data.get('custom_message', '')
                 st.success("Campaign loaded successfully!")
             else:
@@ -178,7 +163,6 @@ def main():
                     'custom_message': st.session_state.get('custom_message', '')
                 }
                 save_campaign(campaign_data)
-                st.success("Campaign saved successfully!")
             else:
                 st.error("❌ No campaign data to save.")
     
@@ -218,46 +202,35 @@ def main():
                     progress_bar = st.progress(0)
                     countdown_placeholder = st.empty()
                     
+                    total_messages = len(messages)
+                    total_time = total_messages * delay_between_messages
+                    sent_messages = []
+                    
                     try:
-                        total_messages = len(messages)
-                        sent_messages = []
-                        total_time = total_messages * delay_between_messages
-                        
                         for i, message in enumerate(messages):
                             time.sleep(delay_between_messages)
-                            # Simulate sending message
                             recipient = random.choice(target_numbers)
                             sent_message = f"📩 Sent to {recipient}: {message}"
                             sent_messages.append(sent_message)
-                            # Update placeholder and progress bar
                             placeholder.markdown(sent_message)
-                            progress = (i + 1) / total_messages if total_messages > 0 else 1
+                            progress = (i + 1) / total_messages
                             progress_bar.progress(progress)
                             remaining_time = total_time - (i + 1) * delay_between_messages
-                            countdown_placeholder.markdown(f"⏳ Time remaining: {remaining_time:.1f} seconds")
-                        
-                        # Clear placeholder
-                        placeholder.empty()
-                        countdown_placeholder.empty()
-                        
-                        # Show success message
-                        st.success("✅ Messages sent successfully!")
+                            countdown_placeholder.text(f"⏳ Time remaining: {remaining_time:.1f} seconds")
                     
                     except Exception as e:
                         st.error(f"❌ An error occurred: {e}")
                     
-                    # Display sent messages in an expandable box
-                    with st.expander("📬 Sent Messages", expanded=True):
-                        for msg in sent_messages:
-                            st.write(msg)
+                    st.success("✅ Messages sent successfully!")
+                    
+                    # Display sent messages
+                    with st.expander("📜 Sent Messages", expanded=True):
+                        for sent_message in sent_messages:
+                            st.write(sent_message)
     
     with col3:
-        if st.button("💾 Save Campaign", use_container_width=True):
-            st.success("💾 Campaign saved successfully!")
-    
-    # Footer
-    st.markdown("---")
-    st.markdown("📊 Spam Attacker Pro 3.0 - For educational purposes only")
+        if st.button("❌ Cancel Operation", use_container_width=True):
+            st.stop()
 
 if __name__ == "__main__":
     main()
