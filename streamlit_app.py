@@ -17,23 +17,23 @@ def generate_report(target_numbers, num_messages):
     """Generate a report with delivery and response rates."""
     num_targets = len(target_numbers)
     data = {
-        "Phone Number": target_numbers,
-        "Messages Sent": [num_messages] * num_targets,
-        "Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
-        "Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
+        "📞 Phone Number": target_numbers,
+        "📨 Messages Sent": [num_messages] * num_targets,
+        "📈 Delivery Rate": [random.uniform(0.8, 1.0) for _ in target_numbers],
+        "📊 Response Rate": [random.uniform(0.0, 0.2) for _ in target_numbers]
     }
     return pd.DataFrame(data)
 
 def plot_delivery_rates(df):
     """Plot delivery rates."""
-    return px.bar(df, x="Phone Number", y="Delivery Rate", title="Message Delivery Rates")
+    return px.bar(df, x="📞 Phone Number", y="📈 Delivery Rate", title="📉 Message Delivery Rates")
 
 def plot_response_rates(df):
     """Plot response rates versus messages sent."""
-    return px.scatter(df, x="Messages Sent", y="Response Rate", hover_data=["Phone Number"], title="Response Rates vs Messages Sent")
+    return px.scatter(df, x="📨 Messages Sent", y="📊 Response Rate", hover_data=["📞 Phone Number"], title="📈 Response Rates vs Messages Sent")
 
 def main():
-    st.set_page_config(page_title="Spam Attacker Pro 3.0", layout="wide")
+    st.set_page_config(page_title="🚀 Spam Attacker Pro 3.0", layout="wide")
     
     # Animated title
     st.markdown("<h1 style='text-align: center;'>🚀 Spam Attacker Pro 3.0</h1>", unsafe_allow_html=True)
@@ -56,7 +56,7 @@ def main():
                 raw_numbers = st.text_area("", height=150)
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if format_phone_number(num.strip())]
             else:
-                uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+                uploaded_file = st.file_uploader("📂 Choose a CSV file", type="csv")
                 if uploaded_file is not None:
                     df = pd.read_csv(uploaded_file)
                     target_numbers = [format_phone_number(num) for num in df['Phone Number'].astype(str)]
@@ -68,7 +68,7 @@ def main():
                 else:
                     target_numbers = []
             
-            st.write(f"Number of target numbers: {len(target_numbers)}")
+            st.write(f"📊 Number of target numbers: {len(target_numbers)}")
         
         with col2:
             st.subheader("💬 Message Setup")
@@ -86,7 +86,7 @@ def main():
             if not target_numbers:
                 st.error("❌ Please enter at least one valid phone number.")
             else:
-                with st.spinner("Generating report..."):
+                with st.spinner("🔄 Generating report..."):
                     st.session_state.report_data = generate_report(target_numbers, num_messages)
                     st.success("✅ Report generated successfully!")
         
@@ -105,20 +105,20 @@ def main():
         st.subheader("🛠️ Advanced Settings")
         use_proxies = st.checkbox("🔒 Use Proxy Servers")
         if use_proxies:
-            proxy_list = st.text_area("Enter proxy servers (one per line)")
+            proxy_list = st.text_area("🔗 Enter proxy servers (one per line)")
         
-        st.subheader("⏱️ Scheduling")
+        st.subheader("📅 Scheduling")
         use_schedule = st.checkbox("📅 Schedule Campaign")
         if use_schedule:
-            schedule_date = st.date_input("Select start date")
-            schedule_time = st.time_input("Select start time")
+            schedule_date = st.date_input("📅 Select start date")
+            schedule_time = st.time_input("🕒 Select start time")
         
-        st.subheader("📈 A/B Testing")
+        st.subheader("🔬 A/B Testing")
         use_ab_testing = st.checkbox("🔬 Enable A/B Testing")
         if use_ab_testing:
-            message_a = st.text_area("Message A")
-            message_b = st.text_area("Message B")
-            split_ratio = st.slider("A/B Split Ratio", 0.0, 1.0, 0.5)
+            message_a = st.text_area("💬 Message A")
+            message_b = st.text_area("💬 Message B")
+            split_ratio = st.slider("🔀 A/B Split Ratio", 0.0, 1.0, 0.5)
     
     # Action buttons
     col1, col2 = st.columns([1, 1])
