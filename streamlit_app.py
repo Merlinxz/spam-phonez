@@ -58,6 +58,8 @@ def main():
                 if uploaded_file is not None:
                     df = pd.read_csv(uploaded_file)
                     target_numbers = df['Phone Number'].tolist()
+                    st.write(f"File name: {uploaded_file.name}")
+                    st.write(f"Number of rows: {df.shape[0]}")
                 else:
                     target_numbers = []
             
