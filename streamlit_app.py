@@ -73,7 +73,7 @@ def main():
         with col2:
             st.subheader("💬 Message Setup")
             num_messages = st.number_input("📨 Number of Messages per Target", min_value=1, max_value=99999, value=10)
-            delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.0, max_value=15.0, value=2.0, step=0.1)
+            delay_between_messages = st.number_input("⏱️ Delay Between Messages (seconds)", min_value=0.1, max_value=15.0, value=2.0, step=0.1)
             message_type = st.selectbox("💬 Message Type", ["Random", "Sequential", "Custom"])
             if message_type == "Custom":
                 custom_message = st.text_area("✍️ Enter your custom message template")
@@ -145,54 +145,53 @@ def main():
     
     with col2:
         if st.button("📤 Send Messages", use_container_width=True):
-          if not target_numbers:
-            st.error("❌ Please enter at least one valid phone number.")
-        else:
-           with st.spinner("📡 Simulating message sending..."):
-            if message_type == "Custom":
-                messages = [custom_message] * num_messages
+            if not target_numbers:
+                st.error("❌ Please enter at least one valid phone number.")
             else:
-                messages = generate_spam_messages(num_messages, message_type)
-            
-            placeholder = st.empty()
-            progress_bar = st.progress(0)
-            countdown_placeholder = st.empty()
-            
-            try:
-                total_messages = len(messages)
-                sent_messages = []
-                total_time = total_messages * delay_between_messages
-                
-                for i, message in enumerate(messages):
-                    time.sleep(delay_between_messages)
-                    # Simulate sending message
-                    recipient = random.choice(target_numbers)
-                    sent_message = f"📩 Sent to {recipient}: {message}"
-                    sent_messages.append(sent_message)
-                    # Update placeholder and progress bar
-                    placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
-                    progress = (i + 1) / total_messages if total_messages > 0 else 1
-                    progress_bar.progress(progress)
+                with st.spinner("📡 Simulating message sending..."):
+                    if message_type == "Custom":
+                        messages = [custom_message] * num_messages
+                    else:
+                        messages = generate_spam_messages(num_messages, message_type)
                     
-                    # Calculate remaining time in minutes and seconds for better readability
-                    remaining_time = total_time - (i + 1) * delay_between_messages
-                    minutes, seconds = divmod(remaining_time, 60)
-                    countdown_placeholder.markdown(f"⏳ Time remaining: {int(minutes)}m {int(seconds)}s")
-                
-                # Clear placeholder
-                placeholder.empty()
-                countdown_placeholder.empty()
-                
-                # Show success message
-                st.success("✅ Messages sent successfully!")
-            
-            except Exception as e:
-                st.error(f"❌ An error occurred: {e}")
-            
-            # Display sent messages in an expandable box
-            with st.expander("📬 Sent Messages", expanded=True):
-                for msg in sent_messages:
-                    st.write(msg)
+                    placeholder = st.empty()
+                    progress_bar = st.progress(0)
+                    countdown_placeholder = st.empty()
+                    
+                    try:
+                        total_messages = len(messages)
+                        sent_messages = []
+                        total_time = total_messages * delay_between_messages
+                        
+                        for i, message in enumerate(messages):
+                            time.sleep(delay_between_messages)
+                            # Simulate sending message
+                            recipient = random.choice(target_numbers)
+                            sent_message = f"📩 Sent to {recipient}: {message}"
+                            sent_messages.append(sent_message)
+                            # Update placeholder and progress bar
+                            placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
+                            progress = (i + 1) / total_messages if total_messages > 0 else 1
+                            progress_bar.progress(progress)
+                            remaining_time = total_time - (i + 1) * delay_between_messages
+                            countdown_placeholder.markdown(f"<p style='text-align: center;'>⏳ Time remaining: {remaining_time:.1f} seconds</p>", unsafe_allow_html=True)
+                        
+                        # Clear placeholder
+                        placeholder.empty()
+                        countdown_placeholder.empty()
+                        
+                        # Show success message
+                        st.success("✅ Messages sent successfully!")
+                    
+                    except Exception as e:
+                        st.error(f"❌ An error occurred: {e}")
+                    
+                    # Display sent messages in an expandable box
+                    with st.expander("📬 Sent Messages", expanded=True):
+                        st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+                        for msg in sent_messages:
+                            st.write(msg)
+                        st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
     st.markdown("---")
