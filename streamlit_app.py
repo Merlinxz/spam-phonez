@@ -57,10 +57,10 @@ def main():
                 target_numbers = [format_phone_number(num.strip()) for num in raw_numbers.split('\n') if format_phone_number(num.strip())]
             else:
                 uploaded_files = st.file_uploader("📂 Upload CSV/TXT Files (Max 5 files)", type=["csv", "txt"], accept_multiple_files=True)
-                if len(uploaded_files) > 5:
-                    st.error("❌ You can only upload up to 5 files.")
-                    target_numbers = []
-                elif uploaded_files:
+                if uploaded_files:
+                    if len(uploaded_files) > 5:
+                        st.error("❌ You can only upload up to 5 files.")
+                        uploaded_files = uploaded_files[:5]  # Truncate to 5 files
                     target_numbers = []
                     for uploaded_file in uploaded_files:
                         df = pd.read_csv(uploaded_file)
@@ -198,9 +198,5 @@ def main():
                             st.write(msg)
                         st.markdown("</div>", unsafe_allow_html=True)
     
-    # Footer
-    st.markdown("---")
-    st.markdown("<p style='text-align: center;'>📊 Spam Attacker Pro 3.0 - For educational purposes only</p>", unsafe_allow_html=True)
-
 if __name__ == "__main__":
     main()
