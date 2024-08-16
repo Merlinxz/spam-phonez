@@ -172,7 +172,7 @@ def main():
                             time.sleep(delay_between_messages)
                             # Simulate sending message
                             recipient = random.choice(target_numbers)
-                            sent_message = f"📩 Sent to {recipient}/n {message}"
+                            sent_message = f"📩 Sent to {recipient} \n {message}"
                             sent_messages.append(sent_message)
                             # Update placeholder and progress bar
                             placeholder.markdown(f"<p style='text-align: center;'>{sent_message}</p>", unsafe_allow_html=True)
